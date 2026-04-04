@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>技能树管理系统</title>
+    <link type="text/css" rel="stylesheet" href="libs/css/jsmind.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0d0d2b;
+            --bg-tertiary: #1a0a2e;
+            --bg-card: rgba(10, 10, 30, 0.85);
+            --bg-input: rgba(0, 240, 255, 0.05);
+            --cyan: #00f0ff;
+            --cyan-dim: rgba(0, 240, 255, 0.15);
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --purple: #a855f7;
+            --purple-dim: rgba(168, 85, 247, 0.15);
+            --magenta: #ff2d9b;
+            --green: #00ff88;
+            --green-dim: rgba(0, 255, 136, 0.15);
+            --orange: #ff8c00;
+            --red: #ff3d5a;
+            --gold: #FFD700;
+            --text-primary: #e0e6ed;
+            --text-secondary: #8892a4;
+            --text-dim: #555e6f;
+            --border-glow: rgba(0, 240, 255, 0.2);
+            --font-display: 'Orbitron', 'Microsoft YaHei', sans-serif;
+            --font-body: 'Inter', 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        /* ===== Reset & Global ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(var(--cyan-dim) 1px, transparent 1px),
+                linear-gradient(90deg, var(--cyan-dim) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridPulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes gridPulse {
+            0% {
+                opacity: 0.08;
+            }
+
+            100% {
+                opacity: 0.18;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyan-dim);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan-glow);
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 24px;
+            border-right: 1px solid var(--border-glow);
+            overflow-y: auto;
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        /* Sidebar top accent line */
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        /* ===== Toolbar ===== */
+        .toolbar {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        /* Toolbar bottom glow line */
+        .toolbar::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            padding: 10px 22px;
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            right: 100%;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: all 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+            right: -100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            color: var(--cyan);
+            border-color: rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1);
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(17, 153, 142, 0.15) 100%);
+            color: var(--green);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 40px rgba(0, 255, 136, 0.1);
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.15) 0%, rgba(255, 45, 155, 0.1) 100%);
+            color: var(--orange);
+            border-color: rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3), 0 0 40px rgba(255, 140, 0, 0.1);
+            border-color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, rgba(255, 61, 90, 0.15) 0%, rgba(255, 45, 155, 0.1) 100%);
+            color: var(--red);
+            border-color: rgba(255, 61, 90, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 20px rgba(255, 61, 90, 0.3), 0 0 40px rgba(255, 61, 90, 0.1);
+            border-color: var(--red);
+            transform: translateY(-2px);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0px);
+        }
+
+        /* ===== jsMind Container ===== */
+        #jsmind_container {
+            flex: 1;
+            background:
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                radial-gradient(ellipse at center, rgba(0, 240, 255, 0.03) 0%, transparent 70%),
+                var(--bg-primary);
+            background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+            border-radius: 14px;
+            border: 1px solid var(--border-glow);
+            box-shadow:
+                0 4px 30px rgba(0, 0, 0, 0.4),
+                inset 0 0 60px rgba(0, 240, 255, 0.02);
+            min-height: 600px;
+            position: relative;
+            overflow: auto;
+        }
+
+        /* jsMind inner */
+        .jsmind-inner {
+            position: relative;
+            transition: none;
+            min-width: 200%;
+            min-height: 200%;
+            width: auto;
+            height: auto;
+        }
+
+        /* Root node styles */
+        jmnode[data-is-root="true"] {
+            cursor: grab !important;
+        }
+
+        jmnode[data-is-root="true"]:active {
+            cursor: grabbing !important;
+        }
+
+        /* ===== Form Elements ===== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-dim);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.15), 0 0 4px rgba(0, 240, 255, 0.1);
+            background: rgba(0, 240, 255, 0.08);
+        }
+
+        .form-group select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Checkbox styling */
+        .form-group input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--cyan);
+        }
+
+        /* ===== Color Picker ===== */
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+        }
+
+        .color-option.selected {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--cyan), 0 0 16px var(--cyan-glow);
+        }
+
+        /* ===== Tree List ===== */
+        .tree-list {
+            margin-top: 16px;
+        }
+
+        .tree-item {
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background: rgba(0, 240, 255, 0.03);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            border-left: 3px solid var(--cyan-dim);
+            position: relative;
+        }
+
+        .tree-item:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: var(--border-glow);
+            border-left-color: var(--cyan);
+            transform: translateX(4px);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);
+        }
+
+        .tree-item.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+            border-color: var(--cyan-dim);
+            border-left-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        /* ===== Node Editor ===== */
+        .node-editor {
+            margin-top: 20px;
+            padding: 18px;
+            background: rgba(0, 240, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border-glow);
+            display: none;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .node-editor.active {
+            display: block;
+            animation: fadeSlideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Typography ===== */
+        h2 {
+            font-family: var(--font-display);
+            color: var(--cyan);
+            margin-bottom: 24px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 40px rgba(0, 240, 255, 0.1);
+            text-transform: uppercase;
+        }
+
+        h3 {
+            color: var(--text-secondary);
+            margin: 18px 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: var(--cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 8px var(--cyan-glow);
+        }
+    </style>
+    <script type="text/javascript" src="libs/js/jsmind.js"></script>
+    <script type="text/javascript" src="libs/js/jsmind.draggable-node.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>技能树管理</h2>
+
+            <div class="form-group">
+                <label>技能树名称</label>
+                <input type="text" id="tree_name" placeholder="输入技能树名称" value="我的技能树">
+            </div>
+
+            <div class="form-group">
+                <label>初始技能点</label>
+                <input type="number" id="initial_skill_points" placeholder="初始技能点" value="10" min="0">
+            </div>
+
+            <div class="toolbar" style="flex-direction: column; padding: 0; background: none; box-shadow: none;">
+                <button class="btn btn-primary" onclick="createNewTree()" style="width: 100%; margin-bottom: 10px;">⚡
+                    新建技能树</button>
+                <button class="btn btn-success" onclick="saveTree()" style="width: 100%; margin-bottom: 10px;">💾
+                    保存技能树</button>
+                <button class="btn btn-warning" onclick="loadTreeList()" style="width: 100%; margin-bottom: 10px;">🔄
+                    刷新列表</button>
+                <button class="btn btn-primary" onclick="showUserManager()" style="width: 100%; margin-bottom: 10px;">👤
+                    用户管理</button>
+            </div>
+
+            <h3>已保存的技能树</h3>
+            <div id="tree_list" class="tree-list"></div>
+
+            <div class="node-editor" id="user_manager" style="display: none;">
+                <h3>用户管理</h3>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="new_username" placeholder="输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="new_password" placeholder="输入密码（可选）">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="is_admin"> 管理员
+                    </label>
+                </div>
+                <button class="btn btn-success" onclick="createUser()"
+                    style="width: 100%; margin-top: 10px;">创建用户</button>
+                <h3 style="margin-top: 20px;">用户列表</h3>
+                <div id="user_list" style="max-height: 200px; overflow-y: auto; color: var(--text-secondary);"></div>
+            </div>
+
+            <div class="node-editor" id="node_editor">
+                <h3>编辑节点</h3>
+                <div class="form-group">
+                    <label>节点名称</label>
+                    <input type="text" id="node_topic" placeholder="输入节点名称">
+                </div>
+
+                <div class="form-group">
+                    <label>背景颜色</label>
+                    <div class="color-picker" id="bg_color_picker"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>文字颜色</label>
+                    <div class="color-picker" id="fg_color_picker"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>技能点消耗</label>
+                    <input type="number" id="node_cost" placeholder="消耗技能点" value="1" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>技能说明</label>
+                    <textarea id="node_description" placeholder="输入技能说明文字，描述这个技能的具体内容..." rows="4"
+                        style="width: 100%; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-glow); border-radius: 8px; font-family: var(--font-body); color: var(--text-primary); outline: none;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>相关链接</label>
+                    <input type="url" id="node_link" placeholder="输入相关链接（如教程、文档等）"
+                        style="width: 100%; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-glow); border-radius: 8px; color: var(--text-primary); outline: none;">
+                </div>
+
+                <button class="btn btn-success" onclick="updateNode()"
+                    style="width: 100%; margin-top: 10px;">更新节点</button>
+                <button class="btn btn-danger" onclick="deleteNode()"
+                    style="width: 100%; margin-top: 10px;">删除节点</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="toolbar">
+                <button class="btn btn-primary" onclick="addChildNode()">添加子节点</button>
+                <button class="btn btn-primary" onclick="addBrotherNode()">添加兄弟节点</button>
+                <button class="btn btn-warning" onclick="editSelectedNode()">编辑节点</button>
+                <button class="btn btn-danger" onclick="deleteSelectedNode()">删除节点</button>
+            </div>
+
+            <div id="jsmind_container"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const API_BASE = '/api';
+        let jm = null;
+        let currentTreeId = null;
+        let selectedNodeId = null;
+
+        // 王者荣耀风格的颜色方案
+        const colorPalette = {
+            bg: [
+                { name: '金色', value: '#FFD700' },
+                { name: '橙色', value: '#FF8C00' },
+                { name: '红色', value: '#DC143C' },
+                { name: '紫色', value: '#9370DB' },
+                { name: '蓝色', value: '#4169E1' },
+                { name: '青色', value: '#00CED1' },
+                { name: '绿色', value: '#32CD32' },
+                { name: '黄色', value: '#FFD700' },
+                { name: '粉色', value: '#FF69B4' },
+                { name: '深红', value: '#8B0000' },
+                { name: '深蓝', value: '#00008B' },
+                { name: '深绿', value: '#006400' }
+            ],
+            fg: [
+                { name: '黑色', value: '#000000' },
+                { name: '白色', value: '#FFFFFF' },
+                { name: '金色', value: '#FFD700' },
+                { name: '红色', value: '#DC143C' },
+                { name: '蓝色', value: '#4169E1' }
+            ]
+        };
+
+        // 初始化颜色选择器
+        function initColorPickers() {
+            const bgPicker = document.getElementById('bg_color_picker');
+            const fgPicker = document.getElementById('fg_color_picker');
+
+            colorPalette.bg.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'color-option';
+                div.style.background = color.value;
+                div.title = color.name;
+                div.onclick = () => selectColor('bg', color.value, div);
+                bgPicker.appendChild(div);
+            });
+
+            colorPalette.fg.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'color-option';
+                div.style.background = color.value;
+                div.title = color.name;
+                div.onclick = () => selectColor('fg', color.value, div);
+                fgPicker.appendChild(div);
+            });
+        }
+
+        let selectedBgColor = '#FFD700';
+        let selectedFgColor = '#000000';
+
+        function selectColor(type, color, element) {
+            if (type === 'bg') {
+                selectedBgColor = color;
+                document.querySelectorAll('#bg_color_picker .color-option').forEach(el => el.classList.remove('selected'));
+            } else {
+                selectedFgColor = color;
+                document.querySelectorAll('#fg_color_picker .color-option').forEach(el => el.classList.remove('selected'));
+            }
+            element.classList.add('selected');
+        }
+
+        // 初始化jsMind
+        function initMindMap() {
+            const options = {
+                container: 'jsmind_container',
+                theme: 'orange',
+                editable: true,
+                view: {
+                    engine: 'canvas',
+                    hmargin: 100,
+                    vmargin: 50,
+                    line_width: 3,
+                    line_color: '#8B4513',
+                    line_style: 'curved',
+                    draggable: true,
+                    hide_scrollbars_when_draggable: true,
+                    node_overflow: 'hidden',
+                    zoom: {
+                        min: 0.5,
+                        max: 2.1,
+                        step: 0.1,
+                    },
+                },
+                layout: {
+                    hspace: 40,
+                    vspace: 30,
+                    pspace: 15,
+                    cousin_space: 0
+                },
+            };
+
+            jm = new jsMind(options);
+
+            // 监听节点选择事件
+            jm.add_event_listener(function (type, data) {
+                if (type === jsMind.event_type.select) {
+                    selectedNodeId = data.node;
+                    const node = jm.get_node(data.node);
+                    // 如果选中的是根节点，启用拖动功能
+                    if (node && node.isroot) {
+                        enableRootNodeDrag();
+                    } else {
+                        disableRootNodeDrag();
+                    }
+                    showNodeEditor();
+                }
+            });
+
+            // 初始化根节点拖动功能
+            setTimeout(() => {
+                initRootNodeDrag();
+            }, 100);
+
+            // 显示默认技能树（并居中）
+            const defaultMind = {
+                meta: {
+                    name: "技能树",
+                    author: "system",
+                    version: "1.0"
+                },
+                format: "node_tree",
+                data: {
+                    id: "root",
+                    topic: "技能树",
+                    "background-color": "#FFD700",
+                    "foreground-color": "#000000",
+                    children: []
+                }
+            };
+            // 第二个参数为 true，jsMind 会自动将根节点居中
+            jm.show(defaultMind, true);
+            // 额外保险：再次调用居中根节点
+            if (jm && jm.mind && jm.mind.root && jm.view && typeof jm.view.center_root === 'function') {
+                jm.view.center_root(jm.mind.root);
+            }
+            // 重置滚动/transform 并多次尝试居中，避免初始在角落
+            resetAndCenterView();
+            setTimeout(() => resetAndCenterView(), 50);
+            setTimeout(() => resetAndCenterView(), 300);
+        }
+
+        // 创建新技能树
+        function createNewTree() {
+            const name = document.getElementById('tree_name').value || '新技能树';
+            const defaultMind = {
+                meta: {
+                    name: name,
+                    author: "system",
+                    version: "1.0"
+                },
+                format: "node_tree",
+                data: {
+                    id: "root",
+                    topic: name,
+                    status: "activated", // 根节点默认激活
+                    cost: 0,
+                    "background-color": "#FFD700",
+                    "foreground-color": "#000000",
+                    children: []
+                }
+            };
+            jm.show(defaultMind);
+            currentTreeId = null;
+            selectedNodeId = null;
+            document.getElementById('node_editor').classList.remove('active');
+        }
+
+        // 保存技能树
+        async function saveTree() {
+            if (!jm || !jm.mind) {
+                alert('请先创建或加载一个技能树');
+                return;
+            }
+
+            // 从 jsMind 获取数据，并确保包含所有节点的最新信息
+            const mindData = jm.get_data('node_tree');
+            const treeName = document.getElementById('tree_name').value || mindData.meta.name;
+            const initialPoints = parseInt(document.getElementById('initial_skill_points').value) || 10;
+
+            // 从 jsMind 节点对象中提取所有数据，确保包含 description、link 等字段
+            // 因为 jm.get_data() 可能没有包含所有最新更新的字段
+            function enrichNodeData(nodeData, nodeId) {
+                if (!nodeData || !nodeId) return nodeData;
+
+                // 从 jsMind 获取节点对象
+                const node = jm.get_node(nodeId);
+                if (node && node.data) {
+                    // 从节点对象中获取所有数据字段，确保包含最新更新
+                    // 优先使用节点对象中的数据（最新），如果不存在则使用 get_data 返回的数据
+                    if (node.data.description !== undefined) {
+                        nodeData.description = node.data.description;
+                    }
+                    if (node.data.link !== undefined) {
+                        nodeData.link = node.data.link;
+                    }
+                    if (node.data.cost !== undefined && node.data.cost !== null) {
+                        nodeData.cost = node.data.cost;
+                    }
+                    // 确保颜色信息正确（优先使用原始颜色，如果不存在则使用显示颜色）
+                    // 背景颜色
+                    if (node.data['original-background-color'] !== undefined && node.data['original-background-color'] !== null) {
+                        // 如果存在原始颜色，使用原始颜色
+                        nodeData['background-color'] = node.data['original-background-color'];
+                        nodeData['original-background-color'] = node.data['original-background-color'];
+                    } else if (node.data['background-color'] !== undefined && node.data['background-color'] !== null) {
+                        // 如果只有显示颜色，同时设置为原始颜色和显示颜色
+                        nodeData['background-color'] = node.data['background-color'];
+                        nodeData['original-background-color'] = node.data['background-color'];
+                    }
+                    // 前景颜色
+                    if (node.data['original-foreground-color'] !== undefined && node.data['original-foreground-color'] !== null) {
+                        // 如果存在原始颜色，使用原始颜色
+                        nodeData['foreground-color'] = node.data['original-foreground-color'];
+                        nodeData['original-foreground-color'] = node.data['original-foreground-color'];
+                    } else if (node.data['foreground-color'] !== undefined && node.data['foreground-color'] !== null) {
+                        // 如果只有显示颜色，同时设置为原始颜色和显示颜色
+                        nodeData['foreground-color'] = node.data['foreground-color'];
+                        nodeData['original-foreground-color'] = node.data['foreground-color'];
+                    }
+                    // 确保状态信息
+                    if (node.data.status !== undefined) {
+                        nodeData.status = node.data.status;
+                    }
+                }
+
+                // 递归处理子节点
+                if (nodeData.children && Array.isArray(nodeData.children)) {
+                    nodeData.children.forEach(child => {
+                        if (child && child.id) {
+                            enrichNodeData(child, child.id);
+                        }
+                    });
+                }
+
+                return nodeData;
+            }
+
+            // 确保所有节点都有状态和消耗值
+            function setNodeDefaults(node) {
+                if (!node) return;
+
+                // 确保必要字段存在
+                if (!node.id) {
+                    console.warn('节点缺少 id:', node);
+                    return;
+                }
+                if (!node.status) node.status = node.id === 'root' ? 'activated' : 'locked';
+                if (node.cost === undefined || node.cost === null) node.cost = node.id === 'root' ? 0 : 1;
+                // 保留已有的颜色，如果没有才设置默认值（注意：空字符串也是有效值）
+                if (node['background-color'] === undefined || node['background-color'] === null) {
+                    node['background-color'] = '#FFD700';
+                }
+                if (node['foreground-color'] === undefined || node['foreground-color'] === null) {
+                    node['foreground-color'] = '#000000';
+                }
+                if (node.description === undefined) node.description = '';
+                if (node.link === undefined) node.link = '';
+                if (node.expanded === undefined) node.expanded = true;
+
+                // 递归处理子节点
+                if (node.children && Array.isArray(node.children)) {
+                    node.children.forEach(setNodeDefaults);
+                } else if (node.children) {
+                    // 如果不是数组，转换为数组
+                    node.children = [node.children];
+                    node.children.forEach(setNodeDefaults);
+                } else {
+                    // 确保 children 是数组
+                    node.children = [];
+                }
+            }
+
+            // 先丰富节点数据，确保包含所有最新信息
+            enrichNodeData(mindData.data, mindData.data.id);
+
+            // 然后设置默认值（注意：setNodeDefaults 不会覆盖已有的颜色）
+            setNodeDefaults(mindData.data);
+
+            // 清理数据：移除 original-background-color 和 original-foreground-color 字段
+            // 这些字段只用于前端显示和判断，不应该保存到数据库
+            // 数据库只保存 background-color 和 foreground-color
+            function cleanNodeData(node) {
+                if (!node) return;
+                // 移除原始颜色字段，只保留标准颜色字段
+                if ('original-background-color' in node) {
+                    delete node['original-background-color'];
+                }
+                if ('original-foreground-color' in node) {
+                    delete node['original-foreground-color'];
+                }
+                // 递归处理子节点
+                if (node.children && Array.isArray(node.children)) {
+                    node.children.forEach(cleanNodeData);
+                }
+            }
+            cleanNodeData(mindData.data);
+
+            // 调试：检查颜色信息是否正确
+            function checkNodeColors(node, path = '') {
+                if (!node || !node.id) return;
+                const nodePath = path ? `${path}.${node.id}` : node.id;
+                if (node['background-color']) {
+                    console.log(`节点 ${nodePath} 颜色: ${node['background-color']}, 原始颜色: ${node['original-background-color'] || '未设置'}`);
+                }
+                if (node.children && Array.isArray(node.children)) {
+                    node.children.forEach(child => checkNodeColors(child, nodePath));
+                }
+            }
+            console.log('保存前的节点颜色检查:');
+            checkNodeColors(mindData.data);
+
+            // 调试：打印要保存的数据
+            console.log('保存的技能树数据：', JSON.stringify(mindData, null, 2));
+
+            // 验证数据
+            function countNodes(node) {
+                let count = 1;
+                if (node.children && Array.isArray(node.children)) {
+                    node.children.forEach(child => {
+                        count += countNodes(child);
+                    });
+                }
+                return count;
+            }
+            const nodeCount = countNodes(mindData.data);
+            console.log(`节点总数：${nodeCount}`);
+
+            try {
+                let response;
+                let result;
+
+                if (currentTreeId) {
+                    // 更新现有技能树
+                    response = await fetch(`${API_BASE}/trees/${currentTreeId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: treeName,
+                            author: mindData.meta.author,
+                            version: mindData.meta.version,
+                            default_skill_points: initialPoints,
+                            data: mindData.data
+                        })
+                    });
+
+                    if (response.ok) {
+                        result = await response.json();
+                        alert('保存成功！');
+                        loadTreeList();
+                    } else {
+                        const errorText = await response.text();
+                        console.error('保存失败响应：', errorText);
+                        alert('保存失败：' + errorText);
+                    }
+                } else {
+                    // 创建新技能树
+                    response = await fetch(`${API_BASE}/trees`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: treeName,
+                            author: mindData.meta.author,
+                            version: mindData.meta.version,
+                            default_skill_points: initialPoints,
+                            data: mindData.data
+                        })
+                    });
+
+                    if (response.ok) {
+                        result = await response.json();
+                        currentTreeId = result.id;
+                        alert('保存成功！');
+                        loadTreeList();
+                    } else {
+                        const errorText = await response.text();
+                        console.error('保存失败响应：', errorText);
+                        alert('保存失败：' + errorText);
+                    }
+                }
+            } catch (error) {
+                console.error('保存错误：', error);
+                alert('保存失败：' + error.message);
+            }
+        }
+
+        // 加载技能树列表
+        async function loadTreeList() {
+            try {
+                const response = await fetch(`${API_BASE}/trees`);
+                const trees = await response.json();
+
+                const listDiv = document.getElementById('tree_list');
+                listDiv.innerHTML = '';
+
+                trees.forEach(tree => {
+                    const div = document.createElement('div');
+                    div.className = 'tree-item';
+                    div.innerHTML = `
+                        <div style="font-weight: bold;">${tree.name}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${tree.author} | ${new Date(tree.updated_at).toLocaleDateString()}
+                        </div>
+                    `;
+                    div.onclick = (e) => loadTree(tree.id, e.currentTarget);
+                    listDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('加载列表失败：', error);
+            }
+        }
+
+        // 加载指定技能树（后台编辑视图）
+        async function loadTree(treeId, clickedElement = null) {
+            try {
+                const response = await fetch(`${API_BASE}/trees/${treeId}`);
+                const mindData = await response.json();
+
+                // 使用 show 方法，居中显示技能树
+                jm.show(mindData, true);
+                // 再调用一次居中根节点，防止大技能树偏移
+                try {
+                    if (jm && jm.mind && jm.mind.root && jm.view && typeof jm.view.center_root === 'function') {
+                        jm.view.center_root(jm.mind.root);
+                    }
+                } catch (e) {
+                    console.warn('后台居中根节点失败：', e);
+                }
+                // 清理 transform 并将滚动条移到中间，确保初始视图居中
+                resetAndCenterView();
+                setTimeout(() => resetAndCenterView(), 50);
+                setTimeout(() => resetAndCenterView(), 300);
+                currentTreeId = treeId;
+                document.getElementById('tree_name').value = mindData.meta.name;
+
+                // 等待 jsMind 渲染完成后，确保所有节点的颜色正确应用
+                // 使用多次尝试，确保所有节点都已渲染
+                function applyNodeColors(attempt = 0) {
+                    if (attempt > 5) return; // 最多尝试5次
+
+                    if (jm && jm.mind && jm.mind.nodes) {
+                        let appliedCount = 0;
+                        // 遍历所有节点，确保颜色正确应用
+                        Object.keys(jm.mind.nodes).forEach(nodeId => {
+                            const node = jm.get_node(nodeId);
+                            if (node && node.data) {
+                                // 后台编辑模式：优先使用 original-background-color（数据库原始颜色）
+                                // 如果没有，则使用 background-color
+                                const bgColor = node.data['original-background-color'] || node.data['background-color'];
+                                const fgColor = node.data['original-foreground-color'] || node.data['foreground-color'];
+                                if (bgColor && fgColor) {
+                                    jm.set_node_color(nodeId, bgColor, fgColor);
+                                    appliedCount++;
+                                }
+                            }
+                        });
+
+                        // 如果还有节点未应用颜色，继续尝试
+                        if (appliedCount < Object.keys(jm.mind.nodes).length) {
+                            setTimeout(() => applyNodeColors(attempt + 1), 200);
+                        }
+                    } else {
+                        // 如果节点还未准备好，稍后重试
+                        setTimeout(() => applyNodeColors(attempt + 1), 200);
+                    }
+                }
+
+                // 延迟执行，确保 jsMind 已经完成初始渲染
+                setTimeout(() => applyNodeColors(), 300);
+
+                // 更新列表选中状态
+                document.querySelectorAll('.tree-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                if (clickedElement) {
+                    clickedElement.classList.add('active');
+                } else {
+                    // 如果没传递元素，通过 treeId 查找
+                    const items = document.querySelectorAll('.tree-item');
+                    items.forEach(item => {
+                        if (item.textContent.includes(mindData.meta.name)) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+
+                alert('加载成功！');
+            } catch (error) {
+                alert('加载失败：' + error.message);
+            }
+        }
+
+        // 添加子节点
+        function addChildNode() {
+            const selected = jm.get_selected_node();
+            if (!selected) {
+                alert('请先选择一个节点');
+                return;
+            }
+
+            const nodeId = 'node_' + Date.now();
+            const newNode = jm.add_node(selected.id, nodeId, '新节点', {
+                'background-color': selectedBgColor,
+                'foreground-color': selectedFgColor,
+                'status': 'locked', // 默认锁定
+                'cost': 1 // 默认消耗1点
+            });
+
+            if (newNode) {
+                jm.select_node(nodeId);
+                jm.begin_edit(nodeId);
+            }
+        }
+
+        // 添加兄弟节点
+        function addBrotherNode() {
+            const selected = jm.get_selected_node();
+            if (!selected || selected.isroot) {
+                alert('请先选择一个非根节点');
+                return;
+            }
+
+            const nodeId = 'node_' + Date.now();
+            const newNode = jm.insert_node_after(selected.id, nodeId, '新节点', {
+                'background-color': selectedBgColor,
+                'foreground-color': selectedFgColor,
+                'status': 'locked', // 默认锁定
+                'cost': 1 // 默认消耗1点
+            });
+
+            if (newNode) {
+                jm.select_node(nodeId);
+                jm.begin_edit(nodeId);
+            }
+        }
+
+        // 编辑选中的节点
+        function editSelectedNode() {
+            const selected = jm.get_selected_node();
+            if (!selected) {
+                alert('请先选择一个节点');
+                return;
+            }
+            jm.begin_edit(selected.id);
+        }
+
+        // 删除选中的节点
+        function deleteSelectedNode() {
+            const selected = jm.get_selected_node();
+            if (!selected || selected.isroot) {
+                alert('请先选择一个非根节点');
+                return;
+            }
+
+            if (confirm('确定要删除这个节点吗？')) {
+                jm.remove_node(selected.id);
+            }
+        }
+
+        // 显示节点编辑器
+        function showNodeEditor() {
+            const selected = jm.get_selected_node();
+            if (!selected) {
+                document.getElementById('node_editor').classList.remove('active');
+                return;
+            }
+
+            document.getElementById('node_topic').value = selected.topic;
+            const cost = (selected.data && selected.data.cost) ? selected.data.cost : (selected.isroot ? 0 : 1);
+            document.getElementById('node_cost').value = cost;
+            document.getElementById('node_description').value = (selected.data && selected.data.description) ? selected.data.description : '';
+            document.getElementById('node_link').value = (selected.data && selected.data.link) ? selected.data.link : '';
+            document.getElementById('node_editor').classList.add('active');
+
+            // 设置当前颜色
+            // 后台编辑模式：优先使用 original-background-color（数据库原始颜色）
+            // 如果没有，则使用 background-color
+            const bgColor = selected.data['original-background-color'] || selected.data['background-color'] || '#FFD700';
+            const fgColor = selected.data['original-foreground-color'] || selected.data['foreground-color'] || '#000000';
+            selectedBgColor = bgColor;
+            selectedFgColor = fgColor;
+
+            // 选中对应的颜色
+            document.querySelectorAll('#bg_color_picker .color-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.style.background === bgColor ||
+                    el.style.backgroundColor === bgColor ||
+                    getComputedStyle(el).backgroundColor === rgbToHex(bgColor)) {
+                    el.classList.add('selected');
+                }
+            });
+
+            document.querySelectorAll('#fg_color_picker .color-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.style.background === fgColor ||
+                    el.style.backgroundColor === fgColor ||
+                    getComputedStyle(el).backgroundColor === rgbToHex(fgColor)) {
+                    el.classList.add('selected');
+                }
+            });
+        }
+
+        // 更新节点
+        async function updateNode() {
+            if (!selectedNodeId) {
+                alert('请先选择一个节点');
+                return;
+            }
+
+            const topic = document.getElementById('node_topic').value;
+            if (!topic.trim()) {
+                alert('节点名称不能为空');
+                return;
+            }
+
+            const selected = jm.get_selected_node();
+            if (!selected) {
+                alert('节点不存在');
+                return;
+            }
+
+            const cost = parseInt(document.getElementById('node_cost').value) || 1;
+            const description = document.getElementById('node_description').value.trim();
+            const link = document.getElementById('node_link').value.trim();
+
+            // 更新节点
+            jm.update_node(selected.id, topic);
+            jm.set_node_color(selected.id, selectedBgColor, selectedFgColor);
+
+            // 更新节点的额外数据（状态、消耗、说明、链接、颜色）
+            if (!selected.data) selected.data = {};
+            selected.data.cost = cost;
+            selected.data.description = description;
+            selected.data.link = link;
+            // 确保颜色信息被保存到节点数据中（同时保存原始颜色和显示颜色）
+            selected.data['background-color'] = selectedBgColor;
+            selected.data['foreground-color'] = selectedFgColor;
+            // 同时保存原始颜色，确保保存技能树时能正确获取
+            selected.data['original-background-color'] = selectedBgColor;
+            selected.data['original-foreground-color'] = selectedFgColor;
+            if (!selected.data.status) selected.data.status = selected.isroot ? 'activated' : 'locked';
+
+            // 如果已保存到数据库，同步更新
+            if (currentTreeId) {
+                try {
+                    await fetch(`${API_BASE}/trees/${currentTreeId}/nodes/${selected.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            topic: topic,
+                            background_color: selectedBgColor,
+                            foreground_color: selectedFgColor,
+                            direction: selected.direction,
+                            cost: cost,
+                            description: description,
+                            link: link
+                        })
+                    });
+                } catch (error) {
+                    console.error('同步更新失败：', error);
+                }
+            }
+
+            alert('更新成功！');
+        }
+
+        // 删除节点
+        function deleteNode() {
+            deleteSelectedNode();
+            document.getElementById('node_editor').classList.remove('active');
+        }
+
+        // RGB转十六进制
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+            const match = rgb.match(/\d+/g);
+            if (match) {
+                return '#' + match.map(x => {
+                    const hex = parseInt(x).toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                }).join('');
+            }
+            return rgb;
+        }
+
+        // 显示用户管理器
+        function showUserManager() {
+            const manager = document.getElementById('user_manager');
+            const editor = document.getElementById('node_editor');
+            if (manager.style.display === 'none' || !manager.style.display) {
+                manager.style.display = 'block';
+                editor.classList.remove('active');
+                loadUserList();
+            } else {
+                manager.style.display = 'none';
+            }
+        }
+
+        // 加载用户列表
+        async function loadUserList() {
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+                const users = await response.json();
+
+                const listDiv = document.getElementById('user_list');
+                listDiv.innerHTML = '';
+
+                if (users.length === 0) {
+                    listDiv.innerHTML = '<div style="padding: 10px; color: #666;">暂无用户</div>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const div = document.createElement('div');
+                    div.className = 'tree-item';
+                    div.innerHTML = `
+                        <div style="font-weight: bold;">${user.username} ${user.is_admin ? '<span style="color: #FFD700;">(管理员)</span>' : ''}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ID: ${user.id} | ${new Date(user.created_at).toLocaleDateString()}
+                        </div>
+                    `;
+                    listDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('加载用户列表失败：', error);
+                document.getElementById('user_list').innerHTML = '<div style="padding: 10px; color: #f5576c;">加载失败：' + error.message + '</div>';
+            }
+        }
+
+        // 创建用户
+        async function createUser() {
+            const username = document.getElementById('new_username').value.trim();
+            const password = document.getElementById('new_password').value;
+            const isAdmin = document.getElementById('is_admin').checked;
+
+            if (!username) {
+                alert('请输入用户名');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        is_admin: isAdmin
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('用户创建成功！');
+                    document.getElementById('new_username').value = '';
+                    document.getElementById('new_password').value = '';
+                    document.getElementById('is_admin').checked = false;
+                    loadUserList();
+                } else {
+                    alert('创建失败：' + (result.error || '未知错误'));
+                }
+            } catch (error) {
+                alert('创建失败：' + error.message);
+            }
+        }
+
+        // 根节点拖动状态
+        let rootNodeDragEnabled = false;
+        let rootDragState = {
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            startLeft: 0,
+            startTop: 0
+        };
+
+        // 重置并居中视图（避免大树出现在角落）
+        function resetAndCenterView() {
+            const container = document.getElementById('jsmind_container');
+            if (!container || !jm) return;
+
+            const inner = container.querySelector('.jsmind-inner');
+            if (inner) {
+                // 清掉拖动残留的 transform
+                inner.style.transform = 'translate(0px, 0px)';
+            }
+
+            // 将滚动条移动到容器中间
+            const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+            const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+            container.scrollLeft = Math.floor(maxScrollLeft / 2);
+            container.scrollTop = Math.floor(maxScrollTop / 2);
+
+            // 再调用 jsMind 的居中接口
+            try {
+                if (jm.mind && jm.mind.root && jm.view && typeof jm.view.center_root === 'function') {
+                    jm.view.center_root(jm.mind.root);
+                }
+            } catch (e) {
+                console.warn('resetAndCenterView center_root 失败：', e);
+            }
+        }
+
+        // 初始化根节点拖动功能
+        function initRootNodeDrag() {
+            const container = document.getElementById('jsmind_container');
+            if (!container) {
+                setTimeout(() => initRootNodeDrag(), 100);
+                return;
+            }
+
+            // 查找 jsMind 的内部容器
+            const jsmindInner = container.querySelector('.jsmind-inner');
+            if (!jsmindInner) {
+                setTimeout(() => initRootNodeDrag(), 100);
+                return;
+            }
+
+            // 确保内部容器可以移动
+            if (!jsmindInner.style.position || jsmindInner.style.position === 'static') {
+                jsmindInner.style.position = 'relative';
+            }
+        }
+
+        // 启用根节点拖动功能（选中根节点后，拖动整个技能树）
+        function enableRootNodeDrag() {
+            if (rootNodeDragEnabled) return;
+
+            rootNodeDragEnabled = true;
+            const container = document.getElementById('jsmind_container');
+            if (!container) return;
+
+            // 查找 jsMind 的内部容器（包含 canvas 和节点的容器）
+            const jsmindInner = container.querySelector('.jsmind-inner');
+            if (!jsmindInner) {
+                setTimeout(() => enableRootNodeDrag(), 100);
+                return;
+            }
+
+            // 鼠标按下（在根节点上）
+            function handleRootMouseDown(e) {
+                const selectedNode = jm.get_selected_node();
+                if (!selectedNode || !selectedNode.isroot) {
+                    return;
+                }
+
+                // 检查是否点击在根节点上（包括节点本身和其子元素）
+                const nodeElement = selectedNode._data && selectedNode._data.view && selectedNode._data.view.element;
+                if (!nodeElement) {
+                    return;
+                }
+
+                // 检查点击目标是否是根节点或其子元素（排除编辑器）
+                const target = e.target;
+                if (!nodeElement.contains(target) ||
+                    target.closest('#node_editor')) {
+                    return;
+                }
+
+                rootDragState.isDragging = true;
+                rootDragState.startX = e.clientX;
+                rootDragState.startY = e.clientY;
+
+                // 获取当前内部容器的位置（从 transform 或 left/top 获取）
+                let currentLeft = 0;
+                let currentTop = 0;
+
+                // 尝试从 transform 获取
+                const transform = jsmindInner.style.transform;
+                if (transform && transform !== 'none') {
+                    const match = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
+                    if (match) {
+                        currentLeft = parseFloat(match[1]) || 0;
+                        currentTop = parseFloat(match[2]) || 0;
+                    }
+                } else {
+                    // 如果没有 transform，尝试从 left/top 获取
+                    currentLeft = parseInt(jsmindInner.style.left) || 0;
+                    currentTop = parseInt(jsmindInner.style.top) || 0;
+                }
+
+                rootDragState.startLeft = currentLeft;
+                rootDragState.startTop = currentTop;
+
+                container.style.cursor = 'grabbing';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // 鼠标移动
+            function handleRootMouseMove(e) {
+                if (!rootDragState.isDragging) return;
+
+                const deltaX = e.clientX - rootDragState.startX;
+                const deltaY = e.clientY - rootDragState.startY;
+
+                // 移动内部容器（整个技能树）
+                const newLeft = rootDragState.startLeft + deltaX;
+                const newTop = rootDragState.startTop + deltaY;
+
+                // 使用 transform 移动，性能更好
+                jsmindInner.style.transform = `translate(${newLeft}px, ${newTop}px)`;
+
+                // 确保容器有足够空间，避免内容被裁剪
+                // 动态调整容器尺寸，确保拖动时内容不被裁剪
+                const containerRect = container.getBoundingClientRect();
+                const innerRect = jsmindInner.getBoundingClientRect();
+
+                // 计算需要的额外空间（基于拖动距离）
+                const extraWidth = Math.max(0, Math.abs(newLeft) - containerRect.width / 2);
+                const extraHeight = Math.max(0, Math.abs(newTop) - containerRect.height / 2);
+
+                // 动态设置最小尺寸，确保内容不被裁剪
+                if (extraWidth > 0 || extraHeight > 0) {
+                    const baseWidth = containerRect.width;
+                    const baseHeight = containerRect.height;
+                    const minWidthPercent = Math.max(200, ((baseWidth + extraWidth * 2) / baseWidth) * 100);
+                    const minHeightPercent = Math.max(200, ((baseHeight + extraHeight * 2) / baseHeight) * 100);
+                    jsmindInner.style.minWidth = minWidthPercent + '%';
+                    jsmindInner.style.minHeight = minHeightPercent + '%';
+                }
+
+                e.preventDefault();
+            }
+
+            // 鼠标释放
+            function handleRootMouseUp(e) {
+                if (rootDragState.isDragging) {
+                    rootDragState.isDragging = false;
+                    const container = document.getElementById('jsmind_container');
+                    if (container) {
+                        container.style.cursor = 'default';
+                    }
+                    document.body.style.userSelect = '';
+                }
+            }
+
+            // 移除旧的事件监听器（如果存在）
+            if (container._rootDragHandlers) {
+                container.removeEventListener('mousedown', container._rootDragHandlers.mousedown);
+                document.removeEventListener('mousemove', container._rootDragHandlers.mousemove);
+                document.removeEventListener('mouseup', container._rootDragHandlers.mouseup);
+            }
+
+            // 保存事件处理器
+            container._rootDragHandlers = {
+                mousedown: handleRootMouseDown,
+                mousemove: handleRootMouseMove,
+                mouseup: handleRootMouseUp
+            };
+
+            // 添加事件监听器
+            container.addEventListener('mousedown', handleRootMouseDown, { passive: false });
+            document.addEventListener('mousemove', handleRootMouseMove, { passive: false });
+            document.addEventListener('mouseup', handleRootMouseUp);
+
+            // 更新根节点样式，显示可拖动提示
+            updateRootNodeDragStyle(true);
+        }
+
+        // 禁用根节点拖动功能
+        function disableRootNodeDrag() {
+            if (!rootNodeDragEnabled) return;
+
+            rootNodeDragEnabled = false;
+            rootDragState.isDragging = false;
+
+            const container = document.getElementById('jsmind_container');
+            if (container && container._rootDragHandlers) {
+                container.removeEventListener('mousedown', container._rootDragHandlers.mousedown);
+                document.removeEventListener('mousemove', container._rootDragHandlers.mousemove);
+                document.removeEventListener('mouseup', container._rootDragHandlers.mouseup);
+                delete container._rootDragHandlers;
+            }
+
+            // 更新根节点样式
+            updateRootNodeDragStyle(false);
+        }
+
+        // 更新根节点拖动样式
+        function updateRootNodeDragStyle(enabled) {
+            if (!jm || !jm.mind || !jm.mind.root) return;
+
+            const rootNode = jm.get_node(jm.mind.root.id);
+            if (!rootNode || !rootNode._data || !rootNode._data.view || !rootNode._data.view.element) {
+                setTimeout(() => updateRootNodeDragStyle(enabled), 100);
+                return;
+            }
+
+            const element = rootNode._data.view.element;
+            if (enabled) {
+                element.style.cursor = 'grab';
+                element.setAttribute('data-is-root', 'true');
+                element.title = '拖动根节点可移动整个技能树';
+                // 添加视觉提示
+                element.style.border = '2px dashed rgba(102, 126, 234, 0.5)';
+            } else {
+                element.style.cursor = 'pointer';
+                element.removeAttribute('data-is-root');
+                element.title = '';
+                element.style.border = '';
+            }
+        }
+
+        // 初始化
+        window.onload = function () {
+            initColorPickers();
+            initMindMap();
+            loadTreeList();
+        };
+    </script>
+</body>
+
+</html>
