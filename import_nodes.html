@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技能树数据导入 - 管理系统</title>
+    <script src="./libs/css/tailwind.css"></script>
+    <style>
+        .step-active {
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .drop-zone--over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .loader {
+            border-top-color: #3498db;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #paste-area:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* 可编辑预览表：类 Excel 单元格 */
+        #preview-table-wrap {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        #preview-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            box-shadow: 0 1px 0 #e2e8f0;
+        }
+
+        #preview-table-wrap tbody td {
+            padding: 0;
+            vertical-align: top;
+            border-right: 1px solid #f1f5f9;
+        }
+
+        #preview-table-wrap tbody td:last-child {
+            border-right: none;
+        }
+
+        .grid-cell-input {
+            width: 100%;
+            min-width: 6.5rem;
+            max-width: 16rem;
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            background: #fff;
+            font-size: 0.8125rem;
+            line-height: 1.25;
+            color: #1e293b;
+            padding: 0.45rem 0.5rem;
+        }
+
+        .grid-cell-input:hover {
+            background: #f8fafc;
+        }
+
+        .grid-cell-input:focus {
+            outline: none;
+            background: #eff6ff;
+            box-shadow: inset 0 0 0 2px #3b82f6;
+            position: relative;
+            z-index: 2;
+        }
+
+        #preview-table-wrap tbody tr:nth-child(even) .grid-cell-input {
+            background: #fafafa;
+        }
+
+        #preview-table-wrap tbody tr:nth-child(even) .grid-cell-input:hover {
+            background: #f1f5f9;
+        }
+
+        #preview-table-wrap tbody tr:nth-child(even) .grid-cell-input:focus {
+            background: #eff6ff;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+
+    <div class="max-w-6xl mx-auto py-10 px-4">
+        <div class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">批量导入技能节点</h1>
+                <p class="text-slate-500">选择目标技能树，从 Excel 复制表头与数据区域后粘贴到下方文本框（无需上传文件、无需额外 JS 库）。</p>
+            </div>
+            <button onclick="downloadTemplate()"
+                class="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3"></path>
+                </svg>
+                <span>下载 CSV 模板（可用 Excel 打开编辑）</span>
+            </button>
+        </div>
+
+        <div class="flex items-center space-x-8 mb-10 border-b border-slate-200 text-sm font-medium text-slate-400">
+            <div id="step-1-label" class="pb-2 step-active">1. 选择目标 & 粘贴表格</div>
+            <div id="step-2-label" class="pb-2">2. 解析预览</div>
+            <div id="step-3-label" class="pb-2">3. 确认入库</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+                <h3 class="font-bold text-slate-700 mb-4 flex items-center">
+                    <span
+                        class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs mr-2">1</span>
+                    选择目标技能树
+                </h3>
+                <div class="relative">
+                    <select id="tree-select"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer transition">
+                        <option value="">-- 请选择技能树 --</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                            <path
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <p id="loading-trees" class="text-xs text-blue-500 mt-2 hidden italic">正在同步数据库列表...</p>
+
+                <div class="mt-6 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                    <p class="text-xs text-amber-700 leading-relaxed">
+                        <strong>注意：</strong> 导入操作会向选定的技能树追加节点。如需重新构建，请先清空该树的旧节点。
+                    </p>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-100">
+                    <p class="text-xs text-slate-500 mb-2">可选：加载本地 UTF-8 文本（.csv / .txt），内容将填入粘贴区。</p>
+                    <div id="file-drop"
+                        class="relative border border-dashed border-slate-300 rounded-lg px-3 py-4 text-center text-xs text-slate-500 hover:border-blue-400 transition cursor-pointer">
+                        <input type="file" id="file-input" accept=".csv,.txt,text/csv,text/plain"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        点击或拖入纯文本文件
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm h-full flex flex-col">
+                    <label for="paste-area" class="block text-sm font-semibold text-slate-700 mb-2">从 Excel 粘贴</label>
+                    <p class="text-xs text-slate-500 mb-3 leading-relaxed">
+                        在 Excel 中选中<strong>含表头的一整块区域</strong>，复制（Ctrl+C），在此框内粘贴（Ctrl+V）。第一行必须是列名，与模板一致；Excel 会以制表符分隔列，本页会自动识别。
+                    </p>
+                    <textarea id="paste-area" rows="14" spellcheck="false"
+                        class="w-full flex-1 min-h-[200px] border border-slate-300 rounded-lg px-3 py-2 font-mono text-sm text-slate-800 placeholder-slate-400 resize-y"
+                        placeholder="在此粘贴从 Excel 复制的表格……&#10;&#10;示例列名：temp_id, parent_temp_id, topic, direction, expanded, status, background_color, foreground_color, description, link, link2, level, module, sort_index"></textarea>
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        <button type="button" id="parse-btn"
+                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-sm transition">
+                            解析并预览
+                        </button>
+                        <button type="button" onclick="clearPaste()"
+                            class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-50">
+                            清空粘贴区
+                        </button>
+                        <span id="parse-hint" class="text-xs text-slate-400"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="preview-section" class="hidden mt-10 space-y-4 animate-in fade-in duration-500">
+            <div class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center px-2">
+                <div>
+                    <h3 class="font-bold text-slate-700 flex items-center">
+                        <span
+                            class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs mr-2">2</span>
+                        数据预览与校验（可编辑）
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 pl-8">点击单元格即可修改；Tab 键可在单元格间移动。提交时使用下表中的最新内容。</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 pl-8 sm:pl-0">
+                    <button type="button" onclick="addPreviewRow()"
+                        class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+                        添加一行
+                    </button>
+                    <span id="data-count" class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold">0
+                        条记录</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto max-h-[400px]">
+                    <table id="preview-table-wrap" class="min-w-full divide-y divide-slate-200 border border-slate-200">
+                        <thead id="table-head" class="bg-slate-50 sticky top-0 shadow-sm"></thead>
+                        <tbody id="table-body" class="bg-white divide-y divide-slate-200 text-sm text-slate-600">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end space-x-4">
+                    <button onclick="location.reload()"
+                        class="px-6 py-2 text-slate-500 hover:text-slate-700 font-medium">重置取消</button>
+                    <button id="submit-btn" onclick="submitData()"
+                        class="px-10 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg shadow-blue-200 transition font-bold">
+                        确认提交并入库
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let csvData = [];
+        /** 当前预览表列顺序（与表头一致） */
+        let previewHeaders = [];
+
+        /**
+         * 解析从 Excel 粘贴的 TSV，或从文本文件/粘贴的 CSV。
+         * 不依赖 PapaParse，便于整页复制到其他系统使用。
+         */
+        function parseDelimitedText(raw) {
+            let text = String(raw || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+            if (!text) return [];
+
+            const lines = text.split('\n').map(l => l.replace(/\uFEFF/g, '')).filter(l => l.trim() !== '');
+            if (lines.length < 2) return [];
+
+            const firstLine = lines[0];
+            const tabCount = (firstLine.match(/\t/g) || []).length;
+            const commaCount = (firstLine.match(/,/g) || []).length;
+            const delimiter = tabCount >= commaCount && tabCount > 0 ? '\t' : ',';
+
+            function splitLine(line, delim) {
+                if (delim === '\t') {
+                    return line.split('\t').map(c => c.trim());
+                }
+                const result = [];
+                let cur = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const c = line[i];
+                    if (c === '"') {
+                        inQuotes = !inQuotes;
+                        continue;
+                    }
+                    if (!inQuotes && c === ',') {
+                        result.push(cur.trim());
+                        cur = '';
+                        continue;
+                    }
+                    cur += c;
+                }
+                result.push(cur.trim());
+                return result;
+            }
+
+            const headers = splitLine(firstLine, delimiter).map(h => h.trim());
+            if (!headers.length || !headers[0]) return [];
+
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cells = splitLine(lines[i], delimiter);
+                const obj = {};
+                headers.forEach((h, idx) => {
+                    obj[h] = cells[idx] !== undefined ? cells[idx] : '';
+                });
+                rows.push(obj);
+            }
+            return rows;
+        }
+
+        function runParseFromPaste() {
+            const ta = document.getElementById('paste-area');
+            const hint = document.getElementById('parse-hint');
+            const data = parseDelimitedText(ta.value);
+            if (!data.length) {
+                hint.textContent = '未能解析出数据：请确认已包含表头且至少一行数据。';
+                hint.classList.remove('text-green-600');
+                hint.classList.add('text-amber-600');
+                return;
+            }
+            csvData = data;
+            renderPreview(data);
+            document.getElementById('step-2-label').classList.add('step-active');
+            hint.textContent = `已解析 ${data.length} 行（分隔符：${(ta.value.split('\n')[0] || '').includes('\t') ? '制表符' : '逗号'}）`;
+            hint.classList.remove('text-amber-600');
+            hint.classList.add('text-green-600');
+        }
+
+        function clearPaste() {
+            document.getElementById('paste-area').value = '';
+            document.getElementById('parse-hint').textContent = '';
+        }
+
+        window.onload = async function () {
+            const select = document.getElementById('tree-select');
+            const loadingHint = document.getElementById('loading-trees');
+
+            loadingHint.classList.remove('hidden');
+            try {
+                const res = await fetch('/api/skill-trees/list');
+                const trees = await res.json();
+                trees.forEach(tree => {
+                    const opt = document.createElement('option');
+                    opt.value = tree.id;
+                    opt.textContent = `ID: ${tree.id} - ${tree.name}`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('加载树列表失败', e);
+            } finally {
+                loadingHint.classList.add('hidden');
+            }
+        };
+
+        document.getElementById('parse-btn').addEventListener('click', runParseFromPaste);
+
+        document.getElementById('paste-area').addEventListener('paste', function () {
+            setTimeout(runParseFromPaste, 0);
+        });
+
+        const fileInput = document.getElementById('file-input');
+        const fileDrop = document.getElementById('file-drop');
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('paste-area').value = String(reader.result || '');
+                runParseFromPaste();
+            };
+            reader.readAsText(file, 'UTF-8');
+            e.target.value = '';
+        });
+
+        ['dragenter', 'dragover'].forEach(n =>
+            fileDrop.addEventListener(n, (ev) => {
+                ev.preventDefault();
+                fileDrop.classList.add('drop-zone--over');
+            }));
+        ['dragleave', 'drop'].forEach(n =>
+            fileDrop.addEventListener(n, () => fileDrop.classList.remove('drop-zone--over')));
+        fileDrop.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            const f = ev.dataTransfer.files && ev.dataTransfer.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('paste-area').value = String(reader.result || '');
+                runParseFromPaste();
+            };
+            reader.readAsText(f, 'UTF-8');
+        });
+
+        function syncGridToCsvData() {
+            const body = document.getElementById('table-body');
+            if (!body || !previewHeaders.length) return;
+            const rows = body.querySelectorAll('tr');
+            const next = [];
+            rows.forEach(tr => {
+                const inps = tr.querySelectorAll('input.grid-cell-input');
+                const row = {};
+                previewHeaders.forEach((h, i) => {
+                    row[h] = inps[i] ? inps[i].value : '';
+                });
+                next.push(row);
+            });
+            csvData = next;
+        }
+
+        function renderPreview(data) {
+            const section = document.getElementById('preview-section');
+            const head = document.getElementById('table-head');
+            const body = document.getElementById('table-body');
+
+            section.classList.remove('hidden');
+            previewHeaders = data.length ? Object.keys(data[0]) : [];
+            document.getElementById('data-count').innerText = `${data.length} 条记录`;
+
+            head.innerHTML = `<tr>${previewHeaders.map(h => `<th class="px-3 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide border-b border-slate-200">${escapeHtml(h)}</th>`).join('')}</tr>`;
+
+            body.textContent = '';
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100';
+                previewHeaders.forEach(h => {
+                    const td = document.createElement('td');
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.className = 'grid-cell-input';
+                    inp.autocomplete = 'off';
+                    const v = row[h];
+                    inp.value = v != null && v !== '' ? String(v) : '';
+                    td.appendChild(inp);
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function addPreviewRow() {
+            if (!previewHeaders.length) {
+                alert('请先完成解析，再添加行。');
+                return;
+            }
+            syncGridToCsvData();
+            const empty = {};
+            previewHeaders.forEach(h => { empty[h] = ''; });
+            csvData.push(empty);
+            renderPreview(csvData);
+        }
+
+        async function submitData() {
+            const treeId = document.getElementById('tree-select').value;
+            if (!treeId) {
+                alert('请先在左侧选择目标技能树！');
+                return;
+            }
+            if (!csvData.length) {
+                alert('请先粘贴表格并点击「解析并预览」，或加载文本文件。');
+                return;
+            }
+
+            syncGridToCsvData();
+            if (!csvData.length) {
+                alert('表格中没有有效数据。');
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 正在写入数据库...</span>`;
+
+            try {
+                const response = await fetch('/admin/skill/import-submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tree_id: treeId, nodes: csvData })
+                });
+
+                const res = await response.json();
+                if (response.ok) {
+                    alert('导入成功！共处理 ' + csvData.length + ' 个节点。');
+                    location.reload();
+                } else {
+                    alert('失败：' + (res.error || '未知错误'));
+                }
+            } catch (e) {
+                alert('网络错误，提交失败。');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '确认提交并入库';
+            }
+        }
+
+        function downloadTemplate() {
+            const headers = [
+                'temp_id', 'parent_temp_id', 'topic', 'direction', 'expanded',
+                'status', 'background_color', 'foreground_color', 'description',
+                'link', 'link2', 'level', 'module', 'sort_index'
+            ];
+
+            const rows = [
+                ['1', '', 'Python后端开发', 'right', 'true', 'unlocked', '#f4f5f7', '#3d4451', '根节点说明', 'https://link1.com', 'https://link2.com', '1', '核心模块', '0'],
+                ['2', '1', 'Flask基础', 'right', 'true', 'locked', '#e3f2fd', '#1976d2', '子节点说明', 'https://flask.org', '', '2', 'Web模块', '10']
+            ];
+
+            let csvContent = '\ufeff' + headers.join(',') + '\n';
+            rows.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '技能树节点导入模版_含示例.csv';
+            link.click();
+        }
+    </script>
+
+</body>
+
+</html>

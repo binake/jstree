@@ -300,9 +300,9 @@
             white-space: normal !important;
             /* 允许换行 */
             min-width: 100px !important;
-            /* 增加最小宽度*/
+            /* 增加最小宽�?*/
             max-width: 320px !important;
-            /* 增加最大宽度*/
+            /* 增加最大宽�?*/
             line-height: 1.5 !important;
             padding: 10px 14px !important;
             word-wrap: break-word;
@@ -384,7 +384,7 @@
         }
 
         jmnode[data-status="activated"]::after {
-            content: '▸';
+            content: '�?;
             position: absolute;
             top: -10px;
             right: -10px;
@@ -421,10 +421,10 @@
         }
 
         /*
-         * 覆盖 libs/css/jsmind.css 中 theme-orange 的默认色值
-         * - jmnode.selected 使用 #11f（近似#1111ff）饱和度过高
-         * - jmnode:hover 使用 #f39c12 也较亮
-         * 以下规则与页面 slate 风格统一，并保留节点自身背景的可读性（hoverover 用滤镜柔化）
+         * 覆盖 libs/css/jsmind.css �?theme-orange 的默认色�?
+         * - jmnode.selected 使用 #11f（近�?#1111ff）饱和度过高
+         * - jmnode:hover 使用 #f39c12 也较�?
+         * 以下规则与页�?slate 风格统一，并保留节点自身背景的可读性（hover 用滤镜柔化）
          */
         #jsmind_container jmnodes.theme-orange jmnode:hover {
             filter: saturate(0.68) brightness(1.04);
@@ -1059,7 +1059,7 @@
             cursor: not-allowed;
         }
 
-        /* 激活按钮样式*/
+        /* 激活按钮样�?*/
         .btn-activate-main {
             width: 100%;
             padding: 13px;
@@ -1101,7 +1101,7 @@
             background: var(--err);
         }
 
-        /* 视图切换器样式*/
+        /* 视图切换器样�?*/
         .view-mode-selector {
             display: flex;
             background: var(--surface-3);
@@ -1136,7 +1136,7 @@
             color: var(--text-h);
         }
 
-        /* 画布缩放（jsMind view.zoom），固定于视窗右下角以便独立模式仍可用 */
+        /* 画布缩放（jsMind view.zoom），固定于视窗右下角以便独立模式仍可�?*/
         .zoom-controls {
             position: fixed;
             right: 20px;
@@ -1392,7 +1392,7 @@
         .task-board {
             width: 95%;
             max-width: 900px;
-            /* 竖版布局，宽度收窄 */
+            /* 竖版布局，宽度收�?*/
             max-height: 85vh;
             background: var(--surface-1);
             border: 1px solid var(--border);
@@ -1533,7 +1533,7 @@
             transform: rotate(90deg);
         }
 
-        /* 审核相关状态 */
+        /* 审核相关状�?*/
         .status-badge.pending {
             background: rgba(255, 165, 0, 0.1);
             color: #ffa500;
@@ -1560,52 +1560,6 @@
                 opacity: 1;
             }
         }
-
-        .mode-toggle-group {
-            display: inline-flex;
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            overflow: hidden;
-            margin-left: auto;
-        }
-        .mode-toggle-btn {
-            padding: 9px 16px;
-            font-size: 13.5px;
-            font-family: var(--font-body);
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: transparent;
-            color: var(--text-dim);
-        }
-        .mode-toggle-btn.active {
-            background: var(--accent);
-            color: #fff;
-        }
-        .mode-toggle-btn:hover:not(.active) {
-            background: var(--surface-3);
-            color: var(--text-p);
-        }
-        .hand-mode-active #jsmind_container {
-            cursor: grab !important;
-        }
-        .hand-mode-active #jsmind_container:active {
-            cursor: grabbing !important;
-        }
-        .hand-mode-active jmnode {
-            cursor: grab !important;
-        }
-        .hand-mode-active jmnode:active {
-            cursor: grabbing !important;
-        }
-        .hand-mode-active .jsmind-inner {
-            user-select: none;
-            -webkit-user-select: none;
-        }
     </style>
     <script type="text/javascript" src="libs/js/jsmind.js"></script>
     <script type="text/javascript" src="libs/js/jsmind.draggable-node.js"></script>
@@ -1625,7 +1579,7 @@
         <h1 id="tree_name">技能树</h1>
         <div class="skill-points" style="display: none;">
             <div class="skill-point-item">
-                <div class="icon">🔥</div>
+                <div class="icon">�?/div>
                 <div class="text">可用技能点: <span id="skill_points">0</span></div>
             </div>
             <div class="skill-point-item">
@@ -1639,18 +1593,8 @@
             <div class="view-mode-selector">
                 <button id="btn_view_tree" class="view-mode-btn active" onclick="switchViewMode('tree')">🌳
                     树状视图</button>
-                <button id="btn_view_path" class="view-mode-btn" onclick="switchViewMode('path')">📈 进阶路径</button>
+                <button id="btn_view_path" class="view-mode-btn" onclick="switchViewMode('path')">�?进阶路径</button>
             </div>
-
-            <div class="mode-toggle-group">
-                <button id="mode_hand" class="mode-toggle-btn" onclick="setInteractionMode('hand')" title="手型模式 - 拖拽平移画布">
-                    ✋ <span class="mode-kbd">H</span>
-                </button>
-                <button id="mode_pointer" class="mode-toggle-btn active" onclick="setInteractionMode('pointer')" title="指针模式 - 选择和编辑节点">
-                    🖱 <span class="mode-kbd">V</span>
-                </button>
-            </div>
-
 
             <button class="btn btn-primary" onclick="logout()" style="margin-right: 15px;">登出</button>
             <button class="btn btn-progress" onclick="loadTaskBoard(true)" style="margin-right: 15px;">🎯 学习任务</button>
@@ -1663,7 +1607,7 @@
     </div>
 
     <div class="zoom-controls" title="滚轮在画布上滚动也可缩放">
-        <button type="button" class="btn-zoom" onclick="mindZoomOut()" aria-label="缩小" title="缩小">−</button>
+        <button type="button" class="btn-zoom" onclick="mindZoomOut()" aria-label="缩小" title="缩小">�?/button>
         <span id="zoom_percent_label">100%</span>
         <button type="button" class="btn-zoom" onclick="mindZoomIn()" aria-label="放大" title="放大">+</button>
         <button type="button" class="btn-zoom btn-zoom-reset" onclick="mindZoomReset100()" title="恢复 100% 比例">100%</button>
@@ -1673,7 +1617,7 @@
 
     <div class="node-tooltip" id="node_tooltip"></div>
     <div class="message" id="message"></div>
-    <div class="loading" id="loading" style="display: none;">加载中...</div>
+    <div class="loading" id="loading" style="display: none;">加载�?..</div>
 
     <!-- 节点详细信息面板 -->
     <div class="panel-overlay" id="panel_overlay"></div>
@@ -1684,7 +1628,7 @@
             <div class="panel-close" id="panel_close">×</div>
         </div>
         <div class="panel-section">
-            <div class="section-label">状态</div>
+            <div class="section-label">状�?/div>
             <div id="panel_node_status"></div>
         </div>
         <div class="panel-section" style="display: none;">
@@ -1692,16 +1636,18 @@
             <div style="color: var(--gold); font-size: 18px; font-weight: bold; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"
                 id="panel_node_cost">0</div>
         </div>
-        <div class="panel-section">
-            <div class="section-label">节点等级</div>
-            <div id="panel_node_level" style="color: var(--cyan); font-weight: bold;"></div>
-        </div>
-        <div class="panel-section">
-            <div class="section-label">所属模块</div>
-            <div id="panel_node_module" style="color: var(--cyan); font-weight: bold;"></div>
+        <div class="panel-section" style="display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <div class="section-label">节点等级</div>
+                <div id="panel_node_level" style="color: var(--cyan); font-weight: bold;"></div>
+            </div>
+            <div style="flex: 1;">
+                <div class="section-label">所属模�?/div>
+                <div id="panel_node_module" style="color: var(--cyan); font-weight: bold;"></div>
+            </div>
         </div>
         <div class="panel-section" id="panel_description_section" style="display: none;">
-            <div class="section-label">技能说明</div>
+            <div class="section-label">技能说�?/div>
             <div class="description-content" id="panel_node_description"></div>
         </div>
         <div class="panel-section" id="panel_link_section" style="display: none;">
@@ -1711,7 +1657,7 @@
 
         <div class="panel-section" id="panel_activate_section">
             <button id="btn_panel_activate" class="btn-activate-main">
-                <span>🔥</span> 点亮此技能
+                <span>�?/span> 点亮此技�?
             </button>
         </div>
     </div>
@@ -1724,11 +1670,11 @@
             <div class="progress-panel-close" onclick="hideProgress()">×</div>
         </div>
         <div id="progress_content">
-            <div class="progress-empty">加载中...</div>
+            <div class="progress-empty">加载�?..</div>
         </div>
     </div>
 
-    <!-- 学习任务看板 (登录后弹出 -->
+    <!-- 学习任务看板 (登录后弹�? -->
     <div class="task-board-overlay" id="task_board_overlay">
         <div class="task-board">
             <div class="task-board-header">
@@ -1741,7 +1687,7 @@
                     <div id="tasks_daily" class="task-list"></div>
                 </div>
                 <div class="task-column">
-                    <div class="task-column-header"><span>🗓️</span> 本周计划</div>
+                    <div class="task-column-header"><span>🗓�?/span> 本周计划</div>
                     <div id="tasks_weekly" class="task-list"></div>
                 </div>
                 <div class="task-column">
@@ -1749,12 +1695,12 @@
                     <div id="tasks_monthly" class="task-list"></div>
                 </div>
                 <div class="task-column">
-                    <div class="task-column-header"><span>🏆</span> 本季度/年</div>
+                    <div class="task-column-header"><span>🏆</span> 本季�?�?/div>
                     <div id="tasks_high" class="task-list"></div>
                 </div>
             </div>
             <div style="text-align: center; color: var(--text-dim); font-size: 13px;">
-                * 点击任务卡片即可快速定位至对应的技能节点
+                * 点击任务卡片即可快速定位至对应的技能节�?
             </div>
         </div>
     </div>
@@ -1764,17 +1710,17 @@
         let jm = null;
         let currentTreeId = null;
         let currentNodeUserId = null;  // 当前查看的用户ID
-        let currentUser = null;  // 当前登录的用户信息
-        let nodeStatusMap = {}; // 节点状态映射
+        let currentUser = null;  // 当前登录的用户信�?
+        let nodeStatusMap = {}; // 节点状态映�?
         let originalMindData = null; // 原始树状数据备份
-        let currentViewMode = 'tree'; // 当前视图模式：tree 或 path
+        let currentViewMode = 'tree'; // 当前视图模式：tree �?path
 
-        // 事件监听器函数
+        // 事件监听器函�?
         let eventListener = null;
 
         // 初始化jsMind（只读模式）
         function initMindMap() {
-            // 如果已存在，先清理
+            // 如果已存在，先清�?
             if (jm) {
                 try {
                     if (eventListener) {
@@ -1798,7 +1744,7 @@
                     line_style: 'curved',
                     draggable: true,
                     hide_scrollbars_when_draggable: true,
-                    node_overflow: 'wrap', // 修改为 wrap 以支持换行显示
+                    node_overflow: 'wrap', // 修改�?wrap 以支持换行显�?
                     zoom: {
                         min: 0.25,
                         max: 2.5,
@@ -1830,7 +1776,7 @@
 
             jm = new jsMind(options);
 
-            // 创建新的事件监听器
+            // 创建新的事件监听�?
             eventListener = function (type, data) {
                 try {
                     if (type === jsMind.event_type.select && data && data.node) {
@@ -1845,7 +1791,7 @@
                         handleNodeClick(nodeId);
                     }
                 } catch (error) {
-                    console.error('事件处理错误', error);
+                    console.error('事件处理错误�?, error);
                 }
             };
 
@@ -1856,10 +1802,10 @@
         }
 
         /**
-         * jsMind 缩小后 e_panel.getBoundingClientRect 判断「缩略图是否已小于面板」�?
-         * 本页 .jsmind-inner 设了 min-width/min-height: 200%，e_panel 的 rect 远大于可视区域，
+         * jsMind 缩小�?e_panel.getBoundingClientRect 判断「缩略图是否已小于面板」�?
+         * 本页 .jsmind-inner 设了 min-width/min-height: 200%，e_panel �?rect 远大于可视区域，
          * 会误判为已够小，导致无法缩到 100% 以下。改为用 #jsmind_container 可视区判断，
-         * 缩放时的滚动与锚点也以该容器为准（与空白拖动画布一致）。
+         * 缩放时的滚动与锚点也以该容器为准（与空白拖动画布一致）�?
          */
         function patchJsmindZoomAgainstInflatedPanel() {
             if (!jm || !jm.view || jm.view._zoomViewportGuardPatched) return;
@@ -1906,7 +1852,7 @@
             };
         }
 
-        // 根节点拖动状态
+        // 根节点拖动状�?
         let rootNodeDragEnabled = false;
         let rootDragState = {
             isDragging: false,
@@ -1916,7 +1862,7 @@
             startTop: 0
         };
 
-        // 画布拖动（空白区域拖动，使用 scrollLeft/scrollTop，节点和连线不会分离）
+        // 画布拖动（空白区域拖动，使用 scrollLeft/scrollTop，节点和连线不会分离�?
         let canvasDragEnabled = false;
         function enableCanvasDrag() {
             if (canvasDragEnabled) return;
@@ -1937,15 +1883,11 @@
 
             const shouldDrag = (target) => {
                 if (!target) return false;
-                // 点击在节点上/节点内容上，不触发画布拖动（避免影响节点点击）
-                // 手型模式下允许在节点上拖拽平移
-                if (target.closest && target.closest('jmnode')) {
-                    if (currentInteractionMode !== 'hand') return false;
-                    // hand mode: 允许拖拽节点来平移画布
-                }
+                // 点击在节点上/节点内容上，不触发画布拖动（避免影响节点点击�?
+                if (target.closest && target.closest('jmnode')) return false;
                 if (target.closest && target.closest('.node-detail-panel')) return false;
                 if (target.closest && target.closest('.panel-overlay')) return false;
-                // 允许在容器、内部容器、canvas 上拖动
+                // 允许在容器、内部容器、canvas 上拖�?
                 if (target === container) return true;
                 if (target.classList && target.classList.contains('jsmind-inner')) return true;
                 if (target.tagName && target.tagName.toLowerCase() === 'canvas') return true;
@@ -1954,9 +1896,9 @@
             };
 
             function onMouseDown(e) {
-                if (e.button !== 0) return; // 仅左键
+                if (e.button !== 0) return; // 仅左�?
                 if (!shouldDrag(e.target)) return;
-                // 根节点拖动开启时，优先根节点拖动（避免两个拖动逻辑打架）
+                // 根节点拖动开启时，优先根节点拖动（避免两个拖动逻辑打架�?
                 if (rootNodeDragEnabled) return;
 
                 isDragging = true;
@@ -2005,24 +1947,11 @@
             }
         }
 
-        function disableCanvasDrag() {
-            if (!canvasDragEnabled) return;
-            canvasDragEnabled = false;
-
-            const container = document.getElementById('jsmind_container');
-            if (container && container._canvasDragHandlers) {
-                container.removeEventListener('mousedown', container._canvasDragHandlers.mousedown);
-                document.removeEventListener('mousemove', container._canvasDragHandlers.mousemove);
-                document.removeEventListener('mouseup', container._canvasDragHandlers.mouseup);
-                delete container._canvasDragHandlers;
-            }
-        }
-
         function updateZoomLabel() {
             const el = document.getElementById('zoom_percent_label');
             if (!el) return;
             if (!jm || !jm.view) {
-                el.textContent = '-';
+                el.textContent = '�?;
                 return;
             }
             el.textContent = Math.round(jm.view.zoom_current * 100) + '%';
@@ -2035,7 +1964,7 @@
             }
             const ok = jm.view.zoom_in();
             updateZoomLabel();
-            if (!ok) showMessage('已达到最大缩放', 'warning');
+            if (!ok) showMessage('已达到最大缩�?, 'warning');
         }
 
         function mindZoomOut() {
@@ -2045,7 +1974,7 @@
             }
             const ok = jm.view.zoom_out();
             updateZoomLabel();
-            if (!ok) showMessage('已达到最小缩放（整棵树已能完整放入视窗时无法继续缩小', 'warning');
+            if (!ok) showMessage('已达到最小缩放（整棵树已能完整放入视窗时无法继续缩小�?, 'warning');
         }
 
         function mindZoomReset100() {
@@ -2057,24 +1986,24 @@
             updateZoomLabel();
         }
 
-        // 重置视图并尽量居中（兼容大技能树 + scroll 容器）
+        // 重置视图并尽量居中（兼容大技能树 + scroll 容器�?
         function resetAndCenterView() {
             const container = document.getElementById('jsmind_container');
             if (!container || !jm) return;
 
             const inner = container.querySelector('.jsmind-inner');
             if (inner) {
-                // 清掉上次拖动留下的 transform，避免初始落在角落
+                // 清掉上次拖动留下�?transform，避免初始落在角�?
                 inner.style.transform = 'translate(0px, 0px)';
             }
 
-            // 先把 scroll 移到容器“中间”，避免初始停在右下角/左上角
+            // 先把 scroll 移到容器“中间”，避免初始停在右下�?左上�?
             const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
             const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
             container.scrollLeft = Math.floor(maxScrollLeft / 2);
             container.scrollTop = Math.floor(maxScrollTop / 2);
 
-            // 再用 jsMind �?API 居中根节点（如果可用）
+            // 再用 jsMind �?API 居中根节点（如果可用�?
             try {
                 if (jm.mind && jm.mind.root && jm.view && typeof jm.view.center_root === 'function') {
                     jm.view.center_root(jm.mind.root);
@@ -2084,7 +2013,7 @@
             }
         }
 
-        // 启用根节点拖动功能（选中根节点后，拖动整个技能树）
+        // 启用根节点拖动功能（选中根节点后，拖动整个技能树�?
         function enableRootNodeDrag() {
             if (rootNodeDragEnabled) return;
 
@@ -2092,7 +2021,7 @@
             const container = document.getElementById('jsmind_container');
             if (!container) return;
 
-            // 查找 jsMind 的内部容器（包含 canvas 和节点的容器）
+            // 查找 jsMind 的内部容器（包含 canvas 和节点的容器�?
             const jsmindInner = container.querySelector('.jsmind-inner');
             if (!jsmindInner) {
                 setTimeout(() => enableRootNodeDrag(), 100);
@@ -2104,14 +2033,14 @@
                 jsmindInner.style.position = 'relative';
             }
 
-            // 鼠标按下（在根节点上）
+            // 鼠标按下（在根节点上�?
             function handleRootMouseDown(e) {
                 const selectedNode = jm.get_selected_node();
                 if (!selectedNode || !selectedNode.isroot) {
                     return;
                 }
 
-                // 检查是否点击在根节点上（包括节点本身和其子元素）
+                // 检查是否点击在根节点上（包括节点本身和其子元素�?
                 const nodeElement = selectedNode._data && selectedNode._data.view && selectedNode._data.view.element;
                 if (!nodeElement) {
                     return;
@@ -2127,11 +2056,11 @@
                 rootDragState.startX = e.clientX;
                 rootDragState.startY = e.clientY;
 
-                // 获取当前内部容器的位置（�?transform 或 left/top 获取）
+                // 获取当前内部容器的位置（�?transform �?left/top 获取�?
                 let currentLeft = 0;
                 let currentTop = 0;
 
-                // 尝试从 transform 获取
+                // 尝试�?transform 获取
                 const transform = jsmindInner.style.transform;
                 if (transform && transform !== 'none') {
                     const match = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
@@ -2161,7 +2090,7 @@
                 const deltaX = e.clientX - rootDragState.startX;
                 const deltaY = e.clientY - rootDragState.startY;
 
-                // 移动内部容器（整个技能树）
+                // 移动内部容器（整个技能树�?
                 const newLeft = rootDragState.startLeft + deltaX;
                 const newTop = rootDragState.startTop + deltaY;
 
@@ -2183,23 +2112,23 @@
                 }
             }
 
-            // 保存事件处理器
+            // 保存事件处理�?
             container._rootDragHandlers = {
                 mousedown: handleRootMouseDown,
                 mousemove: handleRootMouseMove,
                 mouseup: handleRootMouseUp
             };
 
-            // 添加事件监听器
+            // 添加事件监听�?
             container.addEventListener('mousedown', handleRootMouseDown, { passive: false });
             document.addEventListener('mousemove', handleRootMouseMove, { passive: false });
             document.addEventListener('mouseup', handleRootMouseUp);
 
-            // 更新根节点样式，显示可拖动提示
+            // 更新根节点样式，显示可拖动提�?
             updateRootNodeDragStyle(true);
         }
 
-        // 禁用根节点拖动功能
+        // 禁用根节点拖动功�?
         function disableRootNodeDrag() {
             if (!rootNodeDragEnabled) return;
 
@@ -2214,11 +2143,11 @@
                 delete container._rootDragHandlers;
             }
 
-            // 更新根节点样式
+            // 更新根节点样�?
             updateRootNodeDragStyle(false);
         }
 
-        // 更新根节点拖动样式
+        // 更新根节点拖动样�?
         function updateRootNodeDragStyle(enabled) {
             if (!jm || !jm.mind || !jm.mind.root) return;
 
@@ -2251,7 +2180,7 @@
             }
 
             if (!jm || !jm.mind) {
-                showMessage('技能树未加载', 'error');
+                showMessage('技能树未加�?, 'error');
                 return;
             }
 
@@ -2266,11 +2195,11 @@
                 return;
             }
 
-            // 【优化】左键点击统一改为显示详情面板，不再直接尝试激活
+            // 【优化】左键点击统一改为显示详情面板，不再直接尝试激�?
             showNodeDetailPanel(node);
         }
 
-        // 激活节点
+        // 激活节�?
         async function activateNode(nodeId) {
             if (!currentNodeUserId) {
                 showMessage('请先选择用户', 'error');
@@ -2299,7 +2228,7 @@
                         updateSkillPoints(result.skill_points);
                         showMessage('节点激活成功！', 'success');
                     }
-                    // 刷新详情面板状态
+                    // 刷新详情面板状�?
                     if (jm) {
                         const node = jm.get_node(nodeId);
                         if (node) showNodeDetailPanel(node);
@@ -2307,10 +2236,10 @@
                     // 刷新显示
                     refreshTree();
                 } else {
-                    showMessage(result.error || '激活失败', 'error');
+                    showMessage(result.error || '激活失�?, 'error');
                 }
             } catch (error) {
-                showMessage('网络错误: ' + error.message, 'error');
+                showMessage('网络错误�? + error.message, 'error');
             }
         }
 
@@ -2345,11 +2274,11 @@
                 renderTasks('tasks_weekly', data.weekly);
                 renderTasks('tasks_monthly', data.monthly);
 
-                // 季度和年度合并显示
+                // 季度和年度合并显�?
                 const highTasks = [...(data.quarterly || []), ...(data.yearly || [])];
                 renderTasks('tasks_high', highTasks);
 
-                // 如果有任务，则显示看板
+                // 如果有任务，则显示看�?
                 const totalTasks = (data.daily?.length || 0) + (data.weekly?.length || 0) + (data.monthly?.length || 0) + highTasks.length;
                 if (totalTasks > 0) {
                     showTaskBoard();
@@ -2395,7 +2324,7 @@
 
             if (!currentUser.is_admin) {
                 // 普通用户只能重置自己的
-                if (!confirm('确定要重置您的技能树吗？所有已激活的节点将恢复锁定状态')) {
+                if (!confirm('确定要重置您的技能树吗？所有已激活的节点将恢复锁定状态�?)) {
                     return;
                 }
 
@@ -2407,24 +2336,24 @@
                     const result = await response.json();
 
                     if (response.ok) {
-                        // 重置所有节点状态
+                        // 重置所有节点状�?
                         for (let nodeId in nodeStatusMap) {
                             nodeStatusMap[nodeId] = 'locked';
                         }
                         updateSkillPoints(result.skill_points);
-                        showMessage('技能树已重置', 'success');
+                        showMessage('技能树已重�?, 'success');
                         refreshTree();
                     } else {
                         showMessage('重置失败', 'error');
                     }
                 } catch (error) {
-                    showMessage('网络错误: ' + error.message, 'error');
+                    showMessage('网络错误�? + error.message, 'error');
                 }
                 return;
             }
 
             // 管理员可以重置所有用户或指定用户
-            const resetAll = confirm('是否重置所有用户的技能树？\n点击"确定"重置所有用户，点击"取消"只重置当前用户');
+            const resetAll = confirm('是否重置所有用户的技能树？\n点击"确定"重置所有用户，点击"取消"只重置当前用�?);
 
             try {
                 const response = await fetch(`${API_BASE}/trees/${currentTreeId}/reset`, {
@@ -2439,22 +2368,22 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    // 重置所有节点状态
+                    // 重置所有节点状�?
                     for (let nodeId in nodeStatusMap) {
                         nodeStatusMap[nodeId] = 'locked';
                     }
                     updateSkillPoints(result.skill_points);
-                    showMessage('技能树已重置', 'success');
+                    showMessage('技能树已重�?, 'success');
                     refreshTree();
                 } else {
                     showMessage('重置失败', 'error');
                 }
             } catch (error) {
-                showMessage('网络错误: ' + error.message, 'error');
+                showMessage('网络错误�? + error.message, 'error');
             }
         }
 
-        // 使用当前登录用户的身份
+        // 使用当前登录用户的身�?
         async function loadUserList() {
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) {
@@ -2469,7 +2398,7 @@
             const userInfoEl = document.getElementById('user_info');
             if (userInfoEl) {
                 let role = '';
-                if (currentUser.is_admin) role = ' (管理员)';
+                if (currentUser.is_admin) role = ' (管理�?';
                 else if (currentUser.is_leader) role = ' (组长)';
                 userInfoEl.textContent = '👤 ' + currentUser.username + role;
             }
@@ -2530,7 +2459,7 @@
                 };
 
             } catch (error) {
-                showMessage('加载列表失败: ' + error.message, 'error');
+                showMessage('加载列表失败�? + error.message, 'error');
             }
         }
 
@@ -2547,7 +2476,7 @@
             try {
                 const response = await fetch(`${API_BASE}/trees/${treeId}?user_id=${userId}`);
                 if (!response.ok) {
-                    throw new Error('加载失败: ' + response.statusText);
+                    throw new Error('加载失败�? + response.statusText);
                 }
 
                 const mindData = await response.json();
@@ -2555,10 +2484,10 @@
                 // 为节点添加等级星号展示（仅前端显示用，不修改后台数据库）
                 // function decorateNodesWithStars(node) {
                 //     if (node && node.topic) {
-                //         // 如果节点有 level 属性，在 topic 前面还没有星星（防止重复添加）
-                //         if (node.level && !node.topic.startsWith("⭐")) {
+                //         // 如果节点�?level 属性，�?topic 前面还没有星星（防止重复添加�?
+                //         if (node.level && !node.topic.startsWith("�?)) {
                 //             const level = parseInt(node.level) || 1;
-                //             const stars = "⭐".repeat(Math.min(level, 5));
+                //             const stars = "�?.repeat(Math.min(level, 5));
                 //             node.topic = stars + node.topic;
                 //         }
                 //     }
@@ -2572,13 +2501,13 @@
                 function decorateNodesWithStars(node) {
                     if (node) {
                         // 1. 处理星星标题
-                        if (node.topic && node.level && !node.topic.startsWith("⭐")) {
+                        if (node.topic && node.level && !node.topic.startsWith("�?)) {
                             const level = parseInt(node.level) || 1;
-                            const stars = "⭐".repeat(Math.min(level, 5));
+                            const stars = "�?.repeat(Math.min(level, 5));
                             node.topic = stars + node.topic;
                         }
 
-                        // 2. 确保 description / link 等在 jsMind 的 node.data 中（与后台 index 一致，供图标读取）
+                        // 2. 确保 description / link 等在 jsMind �?node.data 中（与后�?index 一致，供图标读取）
                         if (!node.data) node.data = {};
                         const extraFields = ['description', 'link', 'link2', 'level', 'module', 'cost'];
                         extraFields.forEach(field => {
@@ -2600,16 +2529,16 @@
                     decorateNodesWithStars(mindData.data);
                 }
 
-                // 记录当前技能树是否可激活
+                // 记录当前技能树是否可激�?
                 window.currentTreeCanActivate = mindData.meta ? mindData.meta.can_activate : true;
 
                 // 如果是只读，显示提示
                 if (window.currentTreeCanActivate === false) {
-                    showMessage('当前技能树为只读模式', 'info');
+                    showMessage('当前技能树为只读模�?, 'info');
                 }
 
                 if (!mindData || !mindData.data) {
-                    throw new Error('技能树数据格式错误：缺少 data 字段');
+                    throw new Error('技能树数据格式错误：缺�?data 字段');
                 }
 
                 // 统计节点数量
@@ -2623,9 +2552,9 @@
                     return count;
                 }
                 const nodeCount = countNodes(mindData.data);
-                console.log(`接收到的节点总数: ${nodeCount}`);
+                console.log(`接收到的节点总数�?{nodeCount}`);
 
-                // 保存节点状态
+                // 保存节点状�?
                 nodeStatusMap = {};
                 function collectStatus(node) {
                     if (node && node.id) {
@@ -2655,12 +2584,12 @@
                         jm.clear_event_listener();
                         // 重置
                         jm._reset();
-                        // 重新添加事件监听器
+                        // 重新添加事件监听�?
                         if (eventListener) {
                             jm.add_event_listener(eventListener);
                         }
                     } catch (resetError) {
-                        console.warn('重置失败，重新初始化', resetError);
+                        console.warn('重置失败，重新初始化�?, resetError);
                         // 如果重置失败，重新初始化
                         initMindMap();
                     }
@@ -2685,25 +2614,25 @@
                     // 预留一些时间让浏览器渲染文字换行和星星装饰
                     setTimeout(() => {
                         if (jm) {
-                            jm.resize(); // 核心：强制重新计算每个节点的大小和位置
-                            applyNodeStyles(); // 应用解锁图标等样式
+                            jm.resize(); // 核心：强制重新计算每个节点的大小和位�?
+                            applyNodeStyles(); // 应用解锁图标等样�?
                             resetAndCenterView(); // 居中
                             updateZoomLabel();
                         }
                     }, 50);
 
-                    // 前台交互：启用空白处拖动画布，并在 show 后重新居中视图
+                    // 前台交互：启用空白处拖动画布，并�?show 后重�?居中视图
                     enableCanvasDrag();
                     resetAndCenterView();
                     updateZoomLabel();
 
-                    // 等待一帧确保渲染完成
+                    // 等待一帧确保渲染完�?
                     requestAnimationFrame(() => {
-                        // 再次保障性调整
+                        // 再次保障性调�?
                         if (jm) jm.resize();
                         updateZoomLabel();
 
-                        // 检查渲染结果
+                        // 检查渲染结�?
                         if (jm && jm.mind && jm.mind.nodes) {
                             const renderedNodeCount = Object.keys(jm.mind.nodes).length;
                             console.log(`渲染后的节点数：${renderedNodeCount}`);
@@ -2721,7 +2650,7 @@
                             }
                         }, 500);
 
-                        // 再次应用样式，确保颜色正确显示
+                        // 再次应用样式，确保颜色正确显�?
                         setTimeout(() => {
                             if (jm && jm.mind && jm.mind.nodes) {
                                 jm.resize();
@@ -2729,7 +2658,7 @@
                             }
                         }, 1200);
 
-                        // 最终兜底，确保所有图标都能显示(针对大数据量或慢速加载
+                        // 最终兜底，确保所有图标都能显�?(针对大数据量或慢速加�?
                         setTimeout(() => {
                             if (jm && jm.mind && jm.mind.nodes) {
                                 applyNodeStyles();
@@ -2737,16 +2666,16 @@
                         }, 2500);
                     });
                 } catch (showError) {
-                    console.error('显示技能树错误', showError);
-                    console.error('错误堆栈', showError.stack);
-                    console.error('数据内容', JSON.stringify(mindData, null, 2));
-                    throw new Error('显示技能树失败: ' + showError.message);
+                    console.error('显示技能树错误�?, showError);
+                    console.error('错误堆栈�?, showError.stack);
+                    console.error('数据内容�?, JSON.stringify(mindData, null, 2));
+                    throw new Error('显示技能树失败�? + showError.message);
                 }
 
                 showMessage('技能树加载成功', 'success');
             } catch (error) {
-                console.error('加载技能树错误', error);
-                showMessage('加载失败: ' + error.message, 'error');
+                console.error('加载技能树错误�?, error);
+                showMessage('加载失败�? + error.message, 'error');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -2768,7 +2697,7 @@
                     addNodeInfoIcon(nodeId);
                 });
 
-                // 图标为 absolute，勿在逐节点 addNodeInfoIcon 内调用 resize（会重排 DOM 导致图标丢失）
+                // 图标�?absolute，勿在逐节�?addNodeInfoIcon 内调�?resize（会重排 DOM 导致图标丢失�?
                 if (jm && typeof jm.resize === 'function') {
                     requestAnimationFrame(() => jm.resize());
                 }
@@ -2776,7 +2705,7 @@
                 // 渲染扩展元素（外框和联系线）
                 renderMindMapExtras();
             } catch (error) {
-                console.error('应用节点样式错误', error);
+                console.error('应用节点样式错误�?, error);
                 setTimeout(() => {
                     if (jm && jm.mind && jm.mind.nodes) {
                         applyNodeStyles();
@@ -2803,11 +2732,11 @@
                 console.warn('解析扩展数据失败:', e);
             }
 
-            // 在这一步，我们不执行 clearRect，因为 jsMind 的连线也在这个 canvas 上
-            // 我们只需要叠加绘制即可
+            // 在这一步，我们不执�?clearRect，因�?jsMind 的连线也在这�?canvas �?
+            // 我们只需要叠加绘制即�?
 
-            // 1. 自动外框 (基于 module 属性
-            if (extraData.autoBoundaries !== false) { // 默认开启
+            // 1. 自动外框 (基于 module 属�?
+            if (extraData.autoBoundaries !== false) { // 默认开�?
                 const moduleGroups = {};
                 if (jm.mind && jm.mind.nodes) {
                     Object.values(jm.mind.nodes).forEach(node => {
@@ -2834,7 +2763,7 @@
                 extraData.boundaries.forEach(b => drawBoundary(ctx, b));
             }
 
-            // 3. 联系线渲染
+            // 3. 联系线渲�?
             if (extraData.relationships && Array.isArray(extraData.relationships)) {
                 extraData.relationships.forEach(r => drawRelationship(ctx, r));
             }
@@ -2885,7 +2814,7 @@
             const h = maxY - minY;
 
             if (boundary.style === 'brace' || boundary.style === 'bracket' || boundary.style === 'curved') {
-                // 绘制概要大括号/方括号(Summary Style)
+                // 绘制概要大括�?方括�?(Summary Style)
                 ctx.save();
                 ctx.strokeStyle = boundary.color || 'rgba(168, 85, 247, 0.8)';
                 ctx.lineWidth = 2.5;
@@ -2897,7 +2826,7 @@
 
                 ctx.beginPath();
                 if (boundary.style === 'brace') {
-                    // Curly Brace 型
+                    // Curly Brace �?
                     ctx.moveTo(maxX, minY + 5);
                     ctx.quadraticCurveTo(braceX, minY + 5, braceX, minY + 20);
                     ctx.lineTo(braceX, midY - 15);
@@ -2906,16 +2835,16 @@
                     ctx.lineTo(braceX, maxY - 20);
                     ctx.quadraticCurveTo(braceX, maxY - 5, maxX, maxY - 5);
                 } else if (boundary.style === 'bracket') {
-                    // Square Bracket 型
+                    // Square Bracket �?
                     ctx.moveTo(maxX, minY + 5);
                     ctx.lineTo(braceX, minY + 5);
                     ctx.lineTo(braceX, maxY - 5);
                     ctx.lineTo(maxX, maxY - 5);
-                    // 加上中间的突出 tip
+                    // 加上中间的突�?tip
                     ctx.moveTo(braceX, midY);
                     ctx.lineTo(tipX, midY);
                 } else {
-                    // Curved Bracket 型
+                    // Curved Bracket �?
                     ctx.moveTo(maxX, minY + 5);
                     ctx.quadraticCurveTo(tipX, midY, maxX, maxY - 5);
                 }
@@ -2962,7 +2891,7 @@
                 ctx.strokeStyle = boundary.color || 'rgba(236, 72, 153, 0.6)';
                 ctx.lineWidth = 2;
 
-                const step = 20; // 弧线的宽度
+                const step = 20; // 弧线的宽�?
                 for (let x = minX; x < maxX; x += step) ctx.arc(x + step / 2, minY, step / 2 + 2, Math.PI, 0, false);
                 for (let y = minY; y < maxY; y += step) ctx.arc(maxX, y + step / 2, step / 2 + 2, -Math.PI / 2, Math.PI / 2, false);
                 for (let x = maxX; x > minX; x -= step) ctx.arc(x - step / 2, maxY, step / 2 + 2, 0, Math.PI, false);
@@ -2970,7 +2899,7 @@
 
                 ctx.stroke();
 
-                // 使用 destination-over 确保背景在连线下方
+                // 使用 destination-over 确保背景在连线下�?
                 ctx.save();
                 ctx.globalCompositeOperation = 'destination-over';
                 ctx.fillStyle = boundary.bgColor || 'rgba(236, 72, 153, 0.12)';
@@ -3010,7 +2939,7 @@
                 return;
             }
 
-            // 默认为矩形外框
+            // 默认为矩形外�?
             ctx.save();
             ctx.beginPath();
             ctx.setLineDash([6, 4]);
@@ -3026,14 +2955,14 @@
             ctx.closePath();
             ctx.stroke();
 
-            // 使用 destination-over 确保背景在连线下方
+            // 使用 destination-over 确保背景在连线下�?
             ctx.save();
             ctx.globalCompositeOperation = 'destination-over';
             ctx.fillStyle = boundary.bgColor || 'rgba(255, 127, 39, 0.12)';
             ctx.fill();
             ctx.restore();
 
-            // 绘制标题 (优化设计：气泡/药丸形状背景)
+            // 绘制标题 (优化设计：气�?药丸形状背景)
             if (boundary.topic && boundary.style !== 'cloud') {
                 ctx.save();
                 ctx.setLineDash([]);
@@ -3068,7 +2997,7 @@
             ctx.restore();
         }
 
-        // 绘制联系线
+        // 绘制联系�?
         function drawRelationship(ctx, rel) {
             const nodeFrom = jm.get_node(rel.from);
             const nodeTo = jm.get_node(rel.to);
@@ -3088,7 +3017,7 @@
             ctx.lineWidth = 2;
             ctx.setLineDash([4, 3]);
 
-            // 使用三次贝塞尔曲线，显得更专业
+            // 使用三次贝塞尔曲线，显得更专�?
             const dist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
             const cp1 = { x: p1.x + (p2.x - p1.x) * 0.2, y: p1.y - dist * 0.2 };
             const cp2 = { x: p1.x + (p2.x - p1.x) * 0.8, y: p2.y - dist * 0.2 };
@@ -3148,7 +3077,7 @@
             ctx.restore();
         }
 
-        /** 用于移除重复的 tooltip 监听（避免多次 applyNodeStyles 叠加）*/
+        /** 用于移除重复�?tooltip 监听（避免多�?applyNodeStyles 叠加�?*/
         const VIEW_NODE_TOOLTIP_KEY = '__viewMindNodeTooltipHandlers';
 
         function addNodeInfoIcon(nodeId) {
@@ -3189,17 +3118,17 @@
             const iconElement = document.createElement('div');
             iconElement.className = 'node-info-icon';
             iconElement.setAttribute('role', 'img');
-            iconElement.setAttribute('aria-label', (hasDescription ? '含技能说明' : '') + (hasLink ? '含相关链接' : ''));
+            iconElement.setAttribute('aria-label', (hasDescription ? '含技能说�?' : '') + (hasLink ? '含相关链�? : ''));
 
             let inner = '';
             if (hasDescription) {
-                inner += '<span class="node-info-glyph" title="有技能说明">📝</span>';
+                inner += '<span class="node-info-glyph" title="有技能说�?>📝</span>';
             }
             if (hasLink) {
-                inner += '<span class="node-info-glyph" title="有相关链接">🔗</span>';
+                inner += '<span class="node-info-glyph" title="有相关链�?>🔗</span>';
             }
             iconElement.innerHTML = inner;
-            iconElement.title = (hasDescription ? '有技能说明\n' : '') + (hasLink ? '有链接信息' : '');
+            iconElement.title = (hasDescription ? '有技能说明\n' : '') + (hasLink ? '有链接信�? : '');
 
             element.appendChild(iconElement);
 
@@ -3242,15 +3171,15 @@
 
             let statusText = '';
             if (status === 'locked') statusText = '🔒 锁定';
-            else if (status === 'unlocked') statusText = '🔓 已解锁';
-            else if (status === 'activated') statusText = '✅ 已激活';
+            else if (status === 'unlocked') statusText = '🔓 已解�?;
+            else if (status === 'activated') statusText = '�?已激�?;
 
-            const stars = '⭐'.repeat(level);
+            const stars = '�?.repeat(level);
 
             let html = `
                 <div class="tooltip-title">${node.topic}</div>
                 <div class="tooltip-status">${statusText}</div>
-                <div style="font-size: 12px; color: var(--cyan-dim); margin: 6px 0;">等级: ${stars} (${level}级) | 模块: ${moduleStr}</div>
+                <div style="font-size: 12px; color: var(--cyan-dim); margin: 6px 0;">等级: ${stars} (${level}�? | 模块: ${moduleStr}</div>
             `;
 
             if (description) {
@@ -3318,9 +3247,9 @@
             const node = jm.get_node(nodeId);
             if (!node) return;
 
-            // 安全检查：确保 _data 和 view 存在
+            // 安全检查：确保 _data �?view 存在
             if (!node._data || !node._data.view || !node._data.view.element) {
-                // 如果元素还未创建，稍后重试
+                // 如果元素还未创建，稍后重�?
                 setTimeout(() => updateNodeStyle(nodeId, status), 100);
                 return;
             }
@@ -3331,7 +3260,7 @@
             // 清理旧状态类
             element.classList.remove('node-locked', 'node-unlocked', 'node-activated');
 
-            // 清理旧状态图标
+            // 清理旧状态图�?
             const oldIcons = element.querySelectorAll('.status-icon');
             oldIcons.forEach(icon => icon.remove());
 
@@ -3351,7 +3280,7 @@
 
                 const activeIcon = document.createElement('div');
                 activeIcon.className = 'status-icon active-icon';
-                activeIcon.innerHTML = '✅';
+                activeIcon.innerHTML = '�?;
                 element.appendChild(activeIcon);
             } else if (status === 'unlocked') {
                 element.classList.add('node-unlocked');
@@ -3365,16 +3294,16 @@
                 element.appendChild(unlockIcon);
             } else if (status === 'pending_approval') {
                 element.classList.add('node-pending');
-                // 更加突出的琥珀色橙色视觉，增加脉动或明显边框
-                element.style.backgroundColor = '#4d3b00'; // 深琥珀色背景
-                element.style.border = '2px solid #ffcc00'; // 亮橙色边框
+                // 更加突出的琥珀�?橙色视觉，增加脉动或明显边框
+                element.style.backgroundColor = '#4d3b00'; // 深琥珀色背�?
+                element.style.border = '2px solid #ffcc00'; // 亮橙色边�?
                 element.style.color = '#ffcc00';
                 element.style.opacity = '1';
                 element.style.boxShadow = '0 0 15px rgba(255, 204, 0, 0.4)';
 
                 const pendingIcon = document.createElement('div');
                 pendingIcon.className = 'status-icon pending-icon';
-                pendingIcon.innerHTML = '⏳';
+                pendingIcon.innerHTML = '�?;
                 element.appendChild(pendingIcon);
             } else {
                 // 默认视为锁定
@@ -3405,7 +3334,7 @@
             }
         }
 
-        // 格式化描述内容（支持简 Markdown 语法）
+        // 格式化描述内容（支持�?Markdown 语法�?
         function formatDescription(text) {
             if (!text) return '';
 
@@ -3421,19 +3350,19 @@
             // 3. 斜体 *text*
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-            // 4. 自定义颜色[color:red](text)
+            // 4. 自定义颜�?[color:red](text)
             html = html.replace(/\[color:(.*?)\]\((.*?)\)/g, '<span style="color:$1;">$2</span>');
 
-            // 5. 自定义字号[size:18px](text)
+            // 5. 自定义字�?[size:18px](text)
             html = html.replace(/\[size:(.*?)\]\((.*?)\)/g, '<span style="font-size:$1;">$2</span>');
 
-            // 6. 自定义缩进[indent:20](text)
+            // 6. 自定义缩�?[indent:20](text)
             html = html.replace(/\[indent:(.*?)\]\((.*?)\)/g, '<div style="margin-left:$1px;">$2</div>');
 
             // 7. 链接 [text](url)
             html = html.replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" style="color:var(--cyan); text-decoration: underline;">$1</a>');
 
-            // 8. 列表处理（每行开头的 - 或 * 或
+            // 8. 列表处理（每行开头的 - �?* �?
             const lines = html.split('\n');
             let inList = false;
             const processedLines = lines.map(line => {
@@ -3459,7 +3388,7 @@
 
             html = processedLines.join('\n');
 
-            // 9. 换行处理（保留 pre-wrap 但转换一些显式换行）
+            // 9. 换行处理（保�?pre-wrap 但转换一些显式换行）
             html = html.replace(/\n\n/g, '<div style="height: 10px;"></div>');
 
             return html;
@@ -3489,30 +3418,30 @@
             // 设置节点标题
             document.getElementById('panel_node_title').textContent = node.topic;
 
-            // 设置等级和模块
-            document.getElementById('panel_node_level').textContent = '⭐'.repeat(level) + ` (${level}级)`;
+            // 设置等级和模�?
+            document.getElementById('panel_node_level').textContent = '�?.repeat(level) + ` (${level}�?`;
             document.getElementById('panel_node_module').textContent = moduleStr;
 
-            // 设置状态
+            // 设置状�?
             let statusText = '';
             let statusClass = '';
             if (status === 'locked') {
                 statusText = '🔒 锁定';
                 statusClass = 'locked';
             } else if (status === 'unlocked') {
-                statusText = '🔓 已解锁';
+                statusText = '🔓 已解�?;
                 statusClass = 'unlocked';
             } else if (status === 'activated') {
-                statusText = '✅ 已激活';
+                statusText = '�?已激�?;
                 statusClass = 'activated';
             } else if (status === 'pending_approval') {
-                statusText = '⏳ 已申请，待审核';
+                statusText = '�?已申请，待审�?;
                 statusClass = 'pending';
             }
             const statusElement = document.getElementById('panel_node_status');
             statusElement.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
 
-            // 更新激活按钮状态
+            // 更新激活按钮状�?
             const activateBtn = document.getElementById('btn_panel_activate');
             const activateSection = document.getElementById('panel_activate_section');
             const canActivate = window.currentTreeCanActivate !== false;
@@ -3524,37 +3453,37 @@
                 if (status === 'activated') {
                     // 已点亮：根据用户要求，暂时屏蔽“取消点亮”功能，隐藏按钮
                     activateSection.style.display = 'none';
-                    activateBtn.innerHTML = '<span>✅</span> 已点亮';
+                    activateBtn.innerHTML = '<span>�?/span> 已点�?;
                     activateBtn.classList.add('activated-state');
                     activateBtn.onclick = null;
                 } else if (status === 'pending_approval') {
-                    // 审核中：禁用按钮或者提示
+                    // 审核中：禁用按钮或者提�?
                     activateSection.style.display = 'block';
-                    activateBtn.innerHTML = '<span>⏳</span> 已申请，待审核';
+                    activateBtn.innerHTML = '<span>�?/span> 已申请，待审�?;
                     activateBtn.classList.add('disabled');
                     activateBtn.classList.remove('activated-state');
                     activateBtn.onclick = () => showMessage('您的申请正在等待组长或管理员审核', 'info');
                 } else {
                     // 未点亮：显示点亮按钮
                     activateSection.style.display = 'block';
-                    activateBtn.innerHTML = '<span>🔥</span> 点亮此技能';
+                    activateBtn.innerHTML = '<span>�?/span> 点亮此技�?;
                     activateBtn.classList.remove('activated-state');
                     activateBtn.classList.remove('deactivate');
                     activateBtn.onclick = () => activateNode(node.id);
                 }
 
-                // 权限检查
+                // 权限检�?
                 if (!canActivate) {
                     activateBtn.classList.add('disabled');
-                    activateBtn.title = '您没有权限对此模块进行操作';
-                    activateBtn.onclick = () => showMessage('只读模式，无法操作', 'warning');
+                    activateBtn.title = '您没有权限对此模块进行操�?;
+                    activateBtn.onclick = () => showMessage('只读模式，无法操�?, 'warning');
                 } else if (status !== 'activated') {
                     activateBtn.classList.remove('disabled');
                     activateBtn.title = '';
                 }
             }
 
-            // 设置消耗
+            // 设置消�?
             document.getElementById('panel_node_cost').textContent = cost;
 
             // 设置描述
@@ -3600,7 +3529,7 @@
                 link2Section.style.display = 'none';
             }
 
-            // 显示面板和遮罩
+            // 显示面板和遮�?
             panel.classList.add('show');
             overlay.classList.add('show');
 
@@ -3641,14 +3570,14 @@
 
             currentViewMode = mode;
 
-            // 更新按钮状态
+            // 更新按钮状�?
             document.getElementById('btn_view_tree').classList.toggle('active', mode === 'tree');
             document.getElementById('btn_view_path').classList.toggle('active', mode === 'path');
             document.getElementById('progress_panel').classList.remove('active');
             document.body.style.overflow = 'auto'; // 恢复滚动
 
             try {
-                // 将模式同步到服务器
+                // 将模式同步到服务�?
                 const response = await fetch(`${API_BASE}/trees/${currentTreeId}/mode`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -3659,13 +3588,13 @@
                     console.warn('同步模式到服务器失败');
                 }
 
-                // 重新从服务器加载数据，以获取最新计算的状态
+                // 重新从服务器加载数据，以获取最新计算的状�?
                 await loadTree(currentTreeId, currentNodeUserId);
 
-                showMessage(`切换为 ${mode === 'tree' ? '树状模式（自下而上解锁）' : '进阶路径模式（线性等级解锁）'}`, 'success');
+                showMessage(`切换�?{mode === 'tree' ? '树状模式（自下而上解锁�? : '进阶路径模式（线性等级解锁）'}`, 'success');
 
             } catch (error) {
-                console.error('切换模式异常', error);
+                console.error('切换模式异常�?, error);
                 // 如果失败，回退本地渲染
                 renderCurrentMode();
             }
@@ -3696,17 +3625,17 @@
                 }, 200);
 
             } catch (error) {
-                console.error('切换视图失败', error);
-                showMessage('切换视图失败: ' + error.message, 'error');
+                console.error('切换视图失败�?, error);
+                showMessage('切换视图失败�? + error.message, 'error');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
-        // 重新组织数据为线性进阶模式(5 -> 4 -> 3 -> 2 -> 1)
+        // 重新组织数据为线性进阶模�?(5 -> 4 -> 3 -> 2 -> 1)
         function getLinearMindData(originalData) {
             const nodes = [];
-            // 递归提取所有节点
+            // 递归提取所有节�?
             function flatten(node) {
                 // 确保业务属性被提取
                 const extraData = {
@@ -3727,7 +3656,7 @@
                     expanded: node.expanded,
                     'background-color': bgColor,
                     'foreground-color': fgColor,
-                    // 将这些属性直接放在顶层，与后端返回的结构保持一致，确保 jsMind 能正确将其放入 node.data
+                    // 将这些属性直接放在顶层，与后端返回的结构保持一致，确保 jsMind 能正确将其放�?node.data
                     level: extraData.level,
                     module: extraData.module,
                     cost: extraData.cost,
@@ -3742,11 +3671,11 @@
 
             flatten(originalData.data);
 
-            // 提取根节点（通常是第一个或 id='root'）
+            // 提取根节点（通常是第一个或�?id='root'�?
             const root = nodes.find(n => n.id === originalData.data.id);
             const otherNodes = nodes.filter(n => n.id !== root.id);
 
-            // 按等级分组(高→低)
+            // 按等级分�?(�?�?)
             const levels = { 5: [], 4: [], 3: [], 2: [], 1: [], 0: [] };
             otherNodes.forEach(node => {
                 const lv = parseInt(node.level) || 0;
@@ -3780,7 +3709,7 @@
             };
         }
 
-        // 初始化面板关闭事件
+        // 初始化面板关闭事�?
         function initPanelEvents() {
             const closeBtn = document.getElementById('panel_close');
             const overlay = document.getElementById('panel_overlay');
@@ -3793,7 +3722,7 @@
                 overlay.addEventListener('click', closeNodeDetailPanel);
             }
 
-            // 初始化右键菜单
+            // 初始化右键菜�?
             document.addEventListener('contextmenu', function (e) {
                 const nodeItem = e.target.closest('jmnode');
                 if (nodeItem) {
@@ -3825,11 +3754,11 @@
             if (status === 'activated') {
                 // 已点亮：根据要求移除“取消点亮”选项
                 html = `<div class="context-menu-item disabled">
-                            <span>✅</span> 已点亮
+                            <span>�?/span> 已点�?
                         </div>`;
             } else {
                 html = `<div class="context-menu-item ${!canActivate ? 'disabled' : ''}" onclick="${canActivate ? `activateNode('${nodeId}')` : `showMessage('只读模式无法操作', 'warning')`}">
-                            <span>🔥</span> 点亮此技能
+                            <span>�?/span> 点亮此技�?
                         </div>`;
             }
 
@@ -3840,7 +3769,7 @@
             menu.innerHTML = html;
             menu.style.display = 'block';
 
-            // 确保不超出屏幕
+            // 确保不超出屏�?
             const rect = menu.getBoundingClientRect();
             let finalX = x;
             let finalY = y;
@@ -3888,7 +3817,7 @@
 
         async function loadProgress() {
             const content = document.getElementById('progress_content');
-            content.innerHTML = '<div class="progress-empty">加载中...</div>';
+            content.innerHTML = '<div class="progress-empty">加载�?..</div>';
 
             if (!currentUser) {
                 content.innerHTML = '<div class="progress-empty">请先登录</div>';
@@ -3905,7 +3834,7 @@
                 const resp = await fetch(url);
                 if (!resp.ok) {
                     const err = await resp.json();
-                    content.innerHTML = `<div class="progress-empty">加载失败: ${err.error || resp.status}</div>`;
+                    content.innerHTML = `<div class="progress-empty">加载失败�?{err.error || resp.status}</div>`;
                     return;
                 }
 
@@ -3944,7 +3873,7 @@
                 }
 
             } catch (e) {
-                content.innerHTML = `<div class="progress-empty">网络错误: ${e.message}</div>`;
+                content.innerHTML = `<div class="progress-empty">网络错误�?{e.message}</div>`;
             }
         }
 
@@ -3964,7 +3893,7 @@
             let html = '';
             for (const u of filtered) {
                 const adminBadge = u.is_admin
-                    ? '<span class="admin-badge">管理员</span>' : '';
+                    ? '<span class="admin-badge">管理�?/span>' : '';
 
                 let modulesHtml = '';
                 if (u.module) {
@@ -3986,7 +3915,7 @@
                         const treeNodes = t.activated_node_details || [];
                         const nodesListHtml = treeNodes.length > 0
                             ? `<div class="nodes-detail-list" id="nodes_detail_${u.user_id}_${t.tree_id}" style="display:none; margin-top:8px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; border-left:2px solid var(--cyan-dim);">
-                                <div style="font-size:11px; color:var(--text-dim); margin-bottom:5px; text-transform:uppercase;">已激活技能详情</div>
+                                <div style="font-size:11px; color:var(--text-dim); margin-bottom:5px; text-transform:uppercase;">已激活技能详�?</div>
                                 <div style="display:flex; flex-wrap:wrap; gap:6px;">
                                     ${treeNodes.map(n => `<span style="font-size:12px; color:var(--cyan); background:rgba(0,216,255,0.1); padding:2px 8px; border-radius:4px; border:1px solid rgba(0,216,255,0.2);">${n.topic}</span>`).join('')}
                                 </div>
@@ -4110,48 +4039,26 @@
                     }
                 }
 
-                // 加载指定的技能树和用户状态
+                // 加载指定的技能树和用户状�?
                 currentNodeUserId = targetUserId;
                 currentTreeId = treeId;
 
                 try {
                     document.getElementById('loading').style.display = 'block';
                     await loadTree(treeId, targetUserId);
-                    // 渲染完成后强制居中
+                    // 渲染完成后强制居�?
                     setTimeout(resetAndCenterView, 500);
                 } catch (e) {
-                    console.error('自动加载树失败', e);
+                    console.error('自动加载树失�?', e);
                 } finally {
                     document.getElementById('loading').style.display = 'none';
                 }
             }
         }
 
-
-                        // ===== Interaction Mode (Hand / Pointer) =====
-        var currentInteractionMode = 'pointer';
-        function setInteractionMode(mode) {
-            currentInteractionMode = mode;
-            document.getElementById('mode_hand').classList.toggle('active', mode === 'hand');
-            document.getElementById('mode_pointer').classList.toggle('active', mode === 'pointer');
-            document.body.classList.toggle('hand-mode-active', mode === 'hand');
-            if (mode === 'hand') {
-                if (jm) { try { jm.disable_edit(); } catch(e) {} }
-                enableCanvasDrag();
-            } else {
-                if (jm) { try { jm.enable_edit(); } catch(e) {} }
-                disableCanvasDrag();
-            }
-        }
-        document.addEventListener('keydown', function(e) {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-            if (e.key === 'h' || e.key === 'H') { e.preventDefault(); setInteractionMode('hand'); }
-            else if (e.key === 'v' || e.key === 'V') { e.preventDefault(); setInteractionMode('pointer'); }
-        });
-
-        // 初始化
+        // 初始�?
         window.onload = async function () {
-            // 初始化面板事件
+            // 初始化面板事�?
             initPanelEvents();
             initMindMap();
             try {
@@ -4159,15 +4066,15 @@
                 const up = new URLSearchParams(window.location.search);
                 // 先加载用户列表和权限基础
                 await loadUserList();
-                // 检查是否有 URL 参数需要自动加载特定视图
+                // 检查是否有 URL 参数需要自动加载特定视�?
                 await checkUrlParams();
 
-                // 如果不是由其他页面重定向过来看进度的，弹出任务看板
+                // 如果不是由其他页面重定向过来看进度的，弹出任务看�?
                 if (!up.get('standalone')) {
                     loadTaskBoard();
                 }
             } catch (e) {
-                console.error('初始化失败', e);
+                console.error('初始化失�?', e);
             }
         };
     </script>

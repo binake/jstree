@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习看板 - Global Dashboard</title>
+    <style>
+        /* ===== Unified Slate Design System ===== */
+        :root {
+            --bg-primary: #f4f5f7;
+            --bg-secondary: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-card-inner: #fafafa;
+
+            --surface-0: #eef0f3;
+            --surface-1: #f4f5f7;
+            --surface-2: #fafafa;
+            --surface-3: #e8eaed;
+
+            --text-primary: #1a1f2e;
+            --text-secondary: #3d4451;
+            --text-p: #475569;
+            --text-dim: #6b7280;
+
+            /* Accents from view.html */
+            --accent: #4a5568;
+            --accent-hover: #2d3748;
+            --cyan: #3d6b50;
+            /* 'ok' green from view.html */
+            --cyan-dim: #edf5ef;
+            --gold: #7a5c2e;
+            --gold-bg: #f5f0e8;
+
+            --progress-fill: linear-gradient(90deg, #3d6b50, #6ca384);
+            --progress-track: rgba(0, 0, 0, 0.05);
+
+            --border: #dde1e7;
+            --border-glow: rgba(74, 85, 104, 0.1);
+
+            --font-body: 'Inter', 'Microsoft YaHei', system-ui, sans-serif;
+            --font-display: 'Inter', 'Microsoft YaHei', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            background: var(--bg-card-inner);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: color 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+            background: var(--cyan-dim);
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* ===== Metrics Cards ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: var(--bg-card-inner);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-title {
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            color: var(--text-primary);
+            font-size: 36px;
+            font-weight: 800;
+            font-family: var(--font-display);
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: var(--bg-card-inner);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--surface-1);
+        }
+
+        .tab-btn.active {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border-bottom: 2px solid var(--cyan);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Global View Layout ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-card-inner);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-label-group {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .group-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .group-modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .group-card {
+            background: var(--bg-card-inner);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .group-card:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .bar-track {
+            height: 12px;
+            background: var(--surface-1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--progress-fill);
+            box-shadow: 0 2px 6px rgba(61, 107, 80, 0.2);
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard th {
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .leaderboard td {
+            padding: 14px 12px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--surface-1);
+        }
+
+        /* ===== User Card View (Matching Image) ===== */
+        .user-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .user-card {
+            background: var(--bg-card);
+            /* f8fafc */
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            /* No extreme shadow, keep it flat and clean like the reference */
+        }
+
+        .ucard-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ucard-avatar {
+            font-size: 20px;
+        }
+
+        .ucard-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-2);
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .badge.admin {
+            background: #f3e8ff;
+            color: #7e22ce;
+            border-color: #e9d5ff;
+        }
+
+        .ucard-stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 140px 100px 90px 40px auto;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            gap: 10px;
+        }
+
+        .stat-tree-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-icon {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .stat-fraction {
+            color: var(--text-dim);
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .stat-percent {
+            color: #b45309;
+            /* Golden brown for percentage */
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .stat-bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .s-bar-track {
+            height: 10px;
+            background: transparent;
+            /* No visible track like in the design, or extremely faint */
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .s-bar-fill {
+            height: 100%;
+            background: var(--progress-fill);
+            border-radius: 5px;
+            min-width: 4px;
+        }
+
+        .stat-view-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .stat-view-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .details-panel {
+            grid-column: 1 / -1;
+            margin-left: 400px;
+            background: var(--surface-2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: none;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .details-panel-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .detail-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .detail-tag {
+            background: var(--cyan-dim);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: var(--cyan);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        /* ===== Approval Center ===== */
+        .approval-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .approval-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .approval-item:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .approval-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .approval-user {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .approval-node {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .approval-meta {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .btn-approve {
+            background: var(--cyan);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-approve:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        /* ===== Task Assignment ===== */
+        .assign-form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .form-row {
+            /* display: grid; */
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-inner);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-hover);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>📊 学习进度图表与看板</h1>
+        <div class="nav-links">
+            <span id="user_info" style="font-weight: bold; color: var(--accent);"></span>
+            <a href="/view.html" >树形预览</a>
+            <a href="/" >技能树管理</a>
+            <a href="/users.html" >用户管理</a>
+            <a href="javascript:void(0)" onclick="logout()" style="color: var(--err); margin-left: 10px;">🔴 退出登录</a>
+
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div id="loading" class="loading">正在加载数据...</div>
+
+        <div id="dashboard_wrapper" style="display: none;">
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-title">总用户数</span>
+                    <span class="metric-value" id="val_users">0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">总技能树</span>
+                    <span class="metric-value" id="val_trees">0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">总技能点 (节点)</span>
+                    <span class="metric-value" id="val_nodes">0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">平台总学习次数 (激活)</span>
+                    <span class="metric-value" id="val_activations">0</span>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('global')">🌐 全员概况</button>
+                <button class="tab-btn" onclick="switchTab('modules')">📚 模块概况</button>
+                <button class="tab-btn" onclick="switchTab('group_A')">👥 A组 进度</button>
+                <button class="tab-btn" onclick="switchTab('group_B')">👥 B组 进度</button>
+                <button class="tab-btn" onclick="switchTab('group_C')">👥 C组 进度</button>
+                <button class="tab-btn" onclick="switchTab('group_D')">👥 D组 进度</button>
+                <button class="tab-btn admin-leader-only" onclick="switchTab('approvals')" id="tab_approvals_btn"
+                    style="display: none;">⚖️ 审核中心</button>
+                <button class="tab-btn admin-leader-only" onclick="switchTab('task_assign')" id="tab_task_assign_btn"
+                    style="display: none;">🎯 任务分配</button>
+            </div>
+
+            <!-- Tab Content: Global -->
+            <div id="tab_global" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="group-modules-grid" id="chart_groups_cards">
+                            <!-- Group Cards Injected Here -->
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h2 class="panel-title">🏆 学霸榜 (Top 10)</h2>
+                        <table class="leaderboard">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>用户</th>
+                                    <th>已点亮</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard_body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Modules -->
+            <div id="tab_modules" class="tab-content">
+                <div class="dashboard-grid" style="grid-template-columns: 1fr;">
+                    <div class="group-modules-grid" id="chart_modules_cards">
+                        <!-- Module Cards Injected Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Group A -->
+            <div id="tab_group_A" class="tab-content">
+                <div class="user-cards-container" id="ucards_A"></div>
+            </div>
+
+            <!-- Tab Content: Group B -->
+            <div id="tab_group_B" class="tab-content">
+                <div class="user-cards-container" id="ucards_B"></div>
+            </div>
+
+            <!-- Tab Content: Group C -->
+            <div id="tab_group_C" class="tab-content">
+                <div class="user-cards-container" id="ucards_C"></div>
+            </div>
+
+            <!-- Tab Content: Group D -->
+            <div id="tab_group_D" class="tab-content">
+                <div class="user-cards-container" id="ucards_D"></div>
+            </div>
+
+            <!-- Tab Content: Approvals -->
+            <div id="tab_approvals" class="tab-content">
+                <div class="panel">
+                    <h2 class="panel-title">⚖️ 待审核申请 (Pending Approvals)</h2>
+                    <div id="approval_list" class="approval-list">
+                        <div class="empty-state">正在加载审核数据...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Task Assignment -->
+            <div id="tab_task_assign" class="tab-content">
+                <div class="assign-form-container">
+                    <h2 class="panel-title">🎯 分配学习任务 (Assign Learning Task)</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>选择人员 (Selected User)</label>
+                            <select id="assign_user_select">
+                                <option value="">-- 选择用户 --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>选择技能树 (Select Tree)</label>
+                            <select id="assign_tree_select">
+                                <option value="">-- 选择技能树 --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>选择节点 (可 Ctrl 多选)</label>
+                            <select id="assign_node_select" class="btn" style="width: 100%; min-height: 120px;"
+                                multiple>
+                                <option value="">-- 先选择技能树 --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>时间跨度 (Task Period)</label>
+                            <select id="assign_type_select">
+                                <option value="daily">当日任务 (Daily)</option>
+                                <option value="weekly" selected>本周计划 (Weekly)</option>
+                                <option value="monthly">本月目标 (Monthly)</option>
+                                <option value="quarterly">本季挑战 (Quarterly)</option>
+                                <option value="yearly">年度项目 (Yearly)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-submit" onclick="submitTaskAssignment()">确认分配任务</button>
+
+                    <div id="user_tasks_panel"
+                        style="margin-top: 30px; display: none; padding-top: 20px; border-top: 1px solid var(--border);">
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--accent);">该用户当前待完成任务 (Active
+                            Tasks)</h3>
+                        <div id="user_tasks_list" style="max-height: 300px; overflow-y: auto;">
+                            <!-- 这里动态加载任务 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 24px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                    <h2 class="panel-title">📋 说明</h2>
+                    <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                        • 任务分配后，用户登录系统时将收到弹窗提醒。<br>
+                        • 组长只能看到并给自己所在组别的成员分配任务。<br>
+                        • 当用户点亮对应技能并审核通过后，该任务会自动标记为已完成。
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let currentUser = null;
+        const API_BASE = '/api';
+
+        // Check access (Admin or Leader)
+        const currentUserStr = localStorage.getItem('currentUser');
+        if (!currentUserStr) {
+            window.location.href = '/login.html?redirect=dashboard.html';
+        } else {
+            const user = JSON.parse(currentUserStr);
+            if (!user.is_admin && !user.is_leader) {
+                alert("仅管理员或组长可以查看管理大盘");
+                window.location.href = '/view.html';
+            } else {
+                currentUser = user;
+                document.getElementById('user_info').textContent = (user.is_admin ? '管理员: ' : '组长: ') + user.username;
+
+                // Show admin/leader only tabs
+                const appBtn = document.getElementById('tab_approvals_btn');
+                const taskBtn = document.getElementById('tab_task_assign_btn');
+                if (appBtn) appBtn.style.display = 'block';
+                if (taskBtn) taskBtn.style.display = 'block';
+                loadAssignmentOptions();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/login.html?redirect=dashboard.html';
+        }
+
+        function refreshAll() {
+            loadDashboard();
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            } else {
+                // Fallback for initial load or script calls
+                const btn = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+                if (btn) btn.classList.add('active');
+            }
+
+            const targetId = 'tab_' + tabId;
+            const content = document.getElementById(targetId);
+            if (content) content.classList.add('active');
+
+            if (tabId === 'approvals') {
+                loadPendingApprovals();
+            }
+        }
+
+        // Fetch and Render Data
+        async function loadDashboard() {
+            try {
+                // 1. Fetch High Level Stats
+                const statsResponse = await fetch('/api/dashboard/stats');
+                if (!statsResponse.ok) throw new Error("获取大盘统计失败");
+                const stats = await statsResponse.json();
+
+                // Set Overview
+                document.getElementById('val_users').textContent = stats.overview.total_users;
+                document.getElementById('val_trees').textContent = stats.overview.total_trees;
+                document.getElementById('val_nodes').textContent = stats.overview.total_nodes;
+                document.getElementById('val_activations').textContent = stats.overview.total_activations;
+
+                // Render Groups Chart (2x2 Grid Layout)
+                const groupContainer = document.getElementById('chart_groups_cards');
+                groupContainer.innerHTML = '';
+
+                // Ensure the 4 primary groups are plotted
+                const groupOrder = ['A', 'B', 'C', 'D'];
+                groupOrder.forEach(gn => {
+                    let g = stats.group_stats.find(x => x.group === gn);
+                    if (!g) {
+                        g = { group: gn, progress: 0, user_count: 0 };
+                    }
+                    const cleanGroupName = g.group.replace(/\s+/g, '');
+                    groupContainer.innerHTML += `
+                        <div class="group-card">
+                            <div class="panel-title" style="font-size: 16px; margin-bottom: 16px; border-bottom: none; padding-bottom: 0;">🎯 ${g.group} 组</div>
+                            <div class="bar-item" style="cursor: pointer;" title="点击收起或展开明细" onclick="document.getElementById('subchart_group_${cleanGroupName}').style.display = document.getElementById('subchart_group_${cleanGroupName}').style.display === 'none' ? 'block' : 'none'">
+                                <div class="bar-label-group">
+                                    <span>综合进度 <span style="color:var(--text-dim);font-size:12px;font-weight:normal;">(${g.user_count}人)</span></span>
+                                    <span>${g.progress}%</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill" style="width: ${g.progress}%; background: #3d6b50;"></div>
+                                </div>
+                            </div>
+                            <div id="subchart_group_${cleanGroupName}" style="display: block; padding-top: 16px; margin-top: 12px; border-top: 1px dashed var(--border);">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Render Modules Chart (Now in its own tab, 2x2 Grid Layout)
+                const moduleContainer = document.getElementById('chart_modules_cards');
+                moduleContainer.innerHTML = '';
+                stats.module_stats.forEach(m => {
+                    const cleanModName = m.module.replace(/\s+/g, '') || 'default';
+                    moduleContainer.innerHTML += `
+                        <div class="group-card">
+                            <div class="panel-title" style="font-size: 16px; margin-bottom: 16px; border-bottom: none; padding-bottom: 0;">📚 ${m.module} 模块</div>
+                            <div class="bar-item" style="cursor: pointer;" title="点击收起或展开明细" onclick="document.getElementById('subchart_module_${cleanModName}').style.display = document.getElementById('subchart_module_${cleanModName}').style.display === 'none' ? 'block' : 'none'">
+                                <div class="bar-label-group">
+                                    <span>综合进度 <span style="color:var(--text-dim);font-size:12px;font-weight:normal;">(${m.tree_count}棵树)</span></span>
+                                    <span>${m.progress}%</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill" style="width: ${m.progress}%; background: #3d6b50;"></div>
+                                </div>
+                            </div>
+                            <div id="subchart_module_${cleanModName}" style="display: block; padding-top: 16px; margin-top: 12px; border-top: 1px dashed var(--border);">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Render Leaderboard
+                const lbBody = document.getElementById('leaderboard_body');
+                lbBody.innerHTML = '';
+                stats.top_users.forEach((u, index) => {
+                    let rankIcon = index + 1;
+                    if (index === 0) rankIcon = '🥇';
+                    if (index === 1) rankIcon = '🥈';
+                    if (index === 2) rankIcon = '🥉';
+                    lbBody.innerHTML += `
+                        <tr>
+                            <td style="font-weight:bold;">${rankIcon}</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    ${u.username} <span class="badge" style="background:var(--surface-1)">${u.group}</span>
+                                </div>
+                            </td>
+                            <td style="color:var(--accent);font-weight:bold;">${u.activated_nodes}</td>
+                        </tr>
+                    `;
+                });
+
+                // 2. Fetch Detail User Progress (requires user id)
+                const progressResponse = await fetch(`/api/progress?user_id=${currentUser.id}&all=true`);
+                if (!progressResponse.ok) throw new Error("获取用户详细进度失败");
+                const userProgressData = await progressResponse.json();
+
+                // Organize users by group
+                const groupData = { A: [], B: [], C: [], D: [] };
+                userProgressData.forEach(up => {
+                    const g = up.group || 'A';
+                    if (groupData[g]) {
+                        groupData[g].push(up);
+                    }
+                });
+
+                // Populate group subcharts in Global tab
+                Object.keys(groupData).forEach(g => {
+                    const subchart = document.getElementById('subchart_group_' + g);
+                    if (subchart) {
+                        let subhtml = '';
+                        groupData[g].forEach(u => {
+                            let uTotNodes = 0;
+                            let uTotActive = 0;
+                            u.trees.forEach(t => {
+                                uTotNodes += t.total_nodes;
+                                uTotActive += t.activated_nodes;
+                            });
+                            let uProg = 0;
+                            if (uTotNodes > 0) uProg = Math.round((uTotActive / uTotNodes) * 100);
+
+                            subhtml += `
+                                <div class="bar-item" style="margin-bottom: 12px; margin-top: 4px;">
+                                    <div class="bar-label-group" style="font-size: 13px;">
+                                        <span style="color: var(--text-secondary);"><span style="font-size: 14px; margin-right: 6px;">👤</span>${u.username}</span>
+                                        <span style="color: var(--text-dim);">点亮: ${uTotActive}/${uTotNodes} <span style="margin-left:8px;font-weight:bold;color:var(--accent);">${uProg}%</span></span>
+                                    </div>
+                                    <div class="bar-track" style="height: 6px; background: var(--surface-1);">
+                                        <div class="bar-fill" style="width: ${uProg}%; background: #3d6b50;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        if (subhtml === '') subhtml = '<div style="font-size: 12px; color: var(--text-dim); padding: 8px 0;">该组暂无人员</div>';
+                        subchart.innerHTML = subhtml;
+                    }
+                });
+
+                // Organize users by their assigned modules for the Modules tab drill-down
+                const moduleDrillData = {};
+                userProgressData.forEach(u => {
+                    const userMods = u.module ? u.module.split(',').map(m => m.trim()).filter(m => m) : ['默认模块'];
+
+                    userMods.forEach(mod => {
+                        if (!moduleDrillData[mod]) moduleDrillData[mod] = [];
+
+                        let mUser = {
+                            user_id: u.user_id,
+                            username: u.username,
+                            totNodes: 0,
+                            totActive: 0
+                        };
+
+                        // Compute progress ONLY from trees belonging to this specific module
+                        u.trees.forEach(t => {
+                            const treeMods = t.module ? t.module.split(',').map(m => m.trim()).filter(m => m) : ['默认模块'];
+                            if (treeMods.includes(mod)) {
+                                mUser.totNodes += t.total_nodes;
+                                mUser.totActive += t.activated_nodes;
+                            }
+                        });
+
+                        moduleDrillData[mod].push(mUser);
+                    });
+                });
+
+                // Populate module subcharts in Modules tab
+                stats.module_stats.forEach(mStat => {
+                    const mod = mStat.module;
+                    const cleanModName = mod.replace(/\s+/g, '') || 'default';
+                    const subchart = document.getElementById('subchart_module_' + cleanModName);
+
+                    if (subchart) {
+                        let subhtml = '';
+                        if (moduleDrillData[mod] && moduleDrillData[mod].length > 0) {
+                            moduleDrillData[mod].forEach(u => {
+                                let uProg = u.totNodes > 0 ? Math.round((u.totActive / u.totNodes) * 100) : 0;
+                                subhtml += `
+                                    <div class="bar-item" style="margin-bottom: 12px; margin-top: 4px;">
+                                        <div class="bar-label-group" style="font-size: 13px;">
+                                            <span style="color: var(--text-secondary);"><span style="font-size: 14px; margin-right: 6px;">👤</span>${u.username}</span>
+                                            <span style="color: var(--text-dim);">点亮: ${u.totActive}/${u.totNodes} <span style="margin-left:8px;font-weight:bold;color:var(--cyan);">${uProg}%</span></span>
+                                        </div>
+                                        <div class="bar-track" style="height: 6px; background: var(--surface-1);">
+                                            <div class="bar-fill" style="width: ${uProg}%; background: #3d6b50;"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        if (subhtml === '') subhtml = '<div style="font-size: 12px; color: var(--text-dim); padding: 8px 0;">该模块暂无被指派的人员</div>';
+                        subchart.innerHTML = subhtml;
+                    }
+                });
+
+                // Function to build individual cards
+                function renderUserCards(users, containerId) {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = '';
+
+                    if (users.length === 0) {
+                        container.innerHTML = '<div style="padding: 20px; color: var(--text-dim);">该组别暂无用户数据</div>';
+                        return;
+                    }
+
+                    users.forEach(user => {
+                        // Tags HTML
+                        const mods = (user.module && user.module !== '默认模块') ? user.module.split(',').filter(m => m.trim()) : [];
+                        let tagsHtml = '';
+                        if (user.is_admin) tagsHtml += `<span class="badge admin">管理员</span>`;
+                        if (user.is_leader) tagsHtml += `<span class="badge leader" style="background:#f59e0b; color:white; border:none;">组长</span>`;
+                        mods.forEach(m => { tagsHtml += `<span class="badge">${m.trim()}</span>`; });
+                        if (tagsHtml === '') tagsHtml = `<span class="badge">未分配模块</span>`;
+
+                        // Trees Progress Rows HTML
+                        let rowsHtml = '';
+                        user.trees.forEach(tree => {
+                            // If total nodes is 0, progress is 0. Skip empty trees or show as 0. 
+                            if (tree.total_nodes === 0) return;
+
+                            const uniqueId = `details_${user.user_id}_${tree.tree_id}`;
+                            let detailsHtml = '';
+                            if (tree.activated_node_details && tree.activated_node_details.length > 0) {
+                                tree.activated_node_details.forEach(n => {
+                                    // Remove stars from topic if any, or keep it. Let's just keep the topic.
+                                    detailsHtml += `<span class="detail-tag">${n.topic}</span>`;
+                                });
+                            } else {
+                                detailsHtml = `<span style="color:var(--text-dim);font-size:12px;">暂无已点亮节点</span>`;
+                            }
+
+                            rowsHtml += `
+                                <div style="display:flex; flex-direction:column;">
+                                    <div class="stat-row">
+                                        <div class="stat-tree-name">
+                                            ${tree.tree_name}
+                                        </div>
+                                        <div>
+                                            <a class="stat-view-link" href="/view.html?tree_id=${tree.tree_id}&user_id=${user.user_id}&standalone=true"  title="查看独立技能树图">
+                                                <span class="stat-icon">🔍</span> 树图
+                                            </a>
+                                        </div>
+                                        <div class="stat-fraction">
+                                            ${tree.activated_nodes}/${tree.total_nodes} 节点
+                                        </div>
+                                        <div class="stat-percent">${tree.percent}%</div>
+                                        <div class="stat-bar-container" style="cursor: pointer;" title="点击查看已点亮详情" onclick="document.getElementById('${uniqueId}').style.display = document.getElementById('${uniqueId}').style.display === 'none' ? 'block' : 'none'">
+                                            <div class="s-bar-track">
+                                                <div class="s-bar-fill" style="width: ${tree.percent}%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details-panel" id="${uniqueId}">
+                                        <div class="details-panel-title">已激活技能详情：</div>
+                                        <div class="detail-tags-container">
+                                            ${detailsHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        if (rowsHtml === '') rowsHtml = '<div style="color:var(--text-dim);font-size:13px;">没有被分配树状图进度数据。</div>';
+
+                        // Card shell
+                        container.innerHTML += `
+                            <div class="user-card">
+                                <div class="ucard-header">
+                                    <div class="ucard-avatar">🧑🏽‍💻</div>
+                                    <div class="ucard-name">${user.username}</div>
+                                    <div style="display:flex;gap:6px;">${tagsHtml}</div>
+                                </div>
+                                <div class="ucard-stats-list">
+                                    ${rowsHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                renderUserCards(groupData.A, 'ucards_A');
+                renderUserCards(groupData.B, 'ucards_B');
+                renderUserCards(groupData.C, 'ucards_C');
+                renderUserCards(groupData.D, 'ucards_D');
+
+                // Show content and hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard_wrapper').style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').textContent = "数据加载失败: " + error.message;
+            }
+        }
+
+        loadDashboard();
+        // 加载待审核请求
+        async function loadPendingApprovals() {
+            const list = document.getElementById('approval_list');
+            try {
+                const resp = await fetch(`${API_BASE}/tasks/pending?user_id=${currentUser.id}`);
+                const data = await resp.json();
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="empty-state">暂无待审核的申请</div>';
+                    return;
+                }
+
+                list.innerHTML = data.map(item => `
+                    <div class="approval-item">
+                        <div class="approval-info">
+                            <div class="approval-user">${item.username} <small style="color:var(--text-dim)">(${item.group}组)</small></div>
+                            <div class="approval-node">申请点亮: <strong>${item.node_topic}</strong></div>
+                            <div class="approval-meta">
+                                技能树: ${item.tree_name} | 消耗: ${item.cost}点 | 时间: ${new Date(item.requested_at).toLocaleString()}
+                            </div>
+                        </div>
+                        <button class="btn-approve" onclick="approveRequest(${item.user_id}, ${item.tree_id}, '${item.node_id}')">
+                            通过审核
+                        </button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = `<div class="empty-state" style="color:var(--err)">加载失败: ${e.message}</div>`;
+            }
+        }
+
+        async function approveRequest(userId, treeId, nodeId) {
+            if (!confirm('确定通过该申请吗？')) return;
+
+            try {
+                const resp = await fetch(`${API_BASE}/tasks/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        approver_id: currentUser.id,
+                        user_id: userId,
+                        tree_id: treeId,
+                        node_id: nodeId
+                    })
+                });
+
+                const res = await resp.json();
+                if (resp.ok) {
+                    alert('审核成功');
+                    loadPendingApprovals();
+                    // 重新加载大盘数据以反映变化
+                    refreshAll();
+                } else {
+                    alert(res.error || '审核失败');
+                }
+            } catch (e) {
+                alert('网络错误: ' + e.message);
+            }
+        }
+
+        // 加载分配任务的选项
+        async function loadAssignmentOptions() {
+            try {
+                // 加载用户
+                const uResp = await fetch(`${API_BASE}/users`);
+                const users = await uResp.json();
+                const userSelect = document.getElementById('assign_user_select');
+
+                // 组长过滤：只能看到本组成员
+                const filteredUsers = currentUser.is_admin
+                    ? users
+                    : users.filter(u => (u.group || '').trim() === (currentUser.group || '').trim() && u.id !== currentUser.id);
+
+                userSelect.innerHTML = '<option value="">-- 选择用户 --</option>' +
+                    filteredUsers.map(u => `<option value="${u.id}">${u.username} (${u.group})</option>`).join('');
+
+                userSelect.onchange = () => {
+                    loadUserTasks();
+                };
+
+                // 加载技能树
+                const tResp = await fetch(`${API_BASE}/trees`);
+                const trees = await tResp.json();
+                const treeSelect = document.getElementById('assign_tree_select');
+                treeSelect.innerHTML = '<option value="">-- 选择技能树 --</option>' +
+                    trees.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+                treeSelect.addEventListener('change', async () => {
+                    const treeId = treeSelect.value;
+                    const nodeSelect = document.getElementById('assign_node_select');
+                    if (!treeId) {
+                        nodeSelect.innerHTML = '<option value="">-- 先选择技能树 --</option>';
+                        return;
+                    }
+
+                    const nResp = await fetch(`${API_BASE}/trees/${treeId}`);
+                    const treeData = await nResp.json();
+
+                    // 获取当前用户在该树下的所有 active 任务，用于标记
+                    const currentUserId = document.getElementById('assign_user_select').value;
+                    let existingNodes = new Set();
+                    if (currentUserId) {
+                        try {
+                            const tResp = await fetch(`${API_BASE}/tasks/my?user_id=${currentUserId}`);
+                            const tData = await tResp.json();
+                            const allTasks = [...tData.daily, ...tData.weekly, ...tData.monthly, ...tData.quarterly, ...tData.yearly];
+                            allTasks.filter(t => t.tree_id == treeId).forEach(t => existingNodes.add(t.node_id));
+                        } catch (e) { }
+                    }
+
+                    // 递归提取所有节点，构建层级路径
+                    const nodes = [];
+                    function extract(n, path = '') {
+                        const currentPath = path ? path + ' > ' + n.topic : n.topic;
+                        if (n.id !== 'root') {
+                            const assigned = existingNodes.has(n.id);
+                            nodes.push({ id: n.id, topic: n.topic, fullPath: currentPath + (assigned ? ' [已分配]' : ''), assigned: assigned });
+                        }
+                        if (n.children) {
+                            n.children.forEach(child => extract(child, currentPath));
+                        }
+                    }
+                    extract(treeData.data);
+
+                    nodeSelect.innerHTML = '<option value="">-- 选择节点 --</option>' +
+                        nodes.map(n => `<option value="${n.id}" ${n.assigned ? 'style="color: var(--err); font-style: italic;"' : ''}>${n.fullPath}</option>`).join('');
+                });
+            } catch (e) {
+                console.error('加载选项失败:', e);
+            }
+        }
+
+        async function submitTaskAssignment() {
+            const userId = document.getElementById('assign_user_select').value;
+            const treeId = document.getElementById('assign_tree_select').value;
+            const nodeSelect = document.getElementById('assign_node_select');
+            const type = document.getElementById('assign_type_select').value;
+
+            // 获取选中的所有 nodeId
+            const selectedNodes = Array.from(nodeSelect.selectedOptions)
+                .map(opt => opt.value)
+                .filter(val => val && val !== '');
+
+            if (!userId || !treeId || selectedNodes.length === 0) {
+                alert('请选择用户、技能树和至少一个节点');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.textContent = '分配中...';
+
+            try {
+                const resp = await fetch(`${API_BASE}/tasks/assign`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        assigner_id: currentUser.id,
+                        user_id: parseInt(userId),
+                        tree_id: parseInt(treeId),
+                        node_ids: selectedNodes,
+                        task_type: type
+                    })
+                });
+
+                const res = await resp.json();
+                if (resp.ok) {
+                    alert(res.message || '学习任务分配成功');
+                    nodeSelect.selectedIndex = -1; // 重置多选
+                    loadUserTasks(); // 刷新下方的任务列表
+                } else {
+                    alert(res.error || '分配失败');
+                }
+            } catch (e) {
+                alert('网络错误: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '确认分配任务';
+            }
+        }
+
+        async function loadUserTasks() {
+            const userId = document.getElementById('assign_user_select').value;
+            const panel = document.getElementById('user_tasks_panel');
+            const list = document.getElementById('user_tasks_list');
+
+            if (!userId) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            try {
+                const resp = await fetch(`${API_BASE}/tasks/my?user_id=${userId}`);
+                const data = await resp.json();
+
+                const allTasks = [
+                    ...data.daily.map(t => ({ ...t, displayType: '当日' })),
+                    ...data.weekly.map(t => ({ ...t, displayType: '周计划' })),
+                    ...data.monthly.map(t => ({ ...t, displayType: '月目标' })),
+                    ...data.quarterly.map(t => ({ ...t, displayType: '季度' })),
+                    ...data.yearly.map(t => ({ ...t, displayType: '年度' }))
+                ];
+
+                if (allTasks.length === 0) {
+                    list.innerHTML = '<div style="color: var(--text-dim); font-size: 13px; padding: 20px; text-align: center;">该用户暂无待完成任务</div>';
+                } else {
+                    list.innerHTML = allTasks.map(t => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; transition: all 0.2s;">
+                            <div style="flex: 1; padding-right: 15px;">
+                                <div style="font-weight: 600; font-size: 14px; color: var(--text-h);">${t.node_path}</div>
+                                <div style="font-size: 11px; color: var(--cyan); margin-top: 4px; display: flex; align-items: center; gap: 6px;">
+                                    <span>📂 ${t.tree_name}</span>
+                                    <span style="background: rgba(0, 240, 255, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2);">${t.displayType}</span>
+                                </div>
+                            </div>
+                            <button onclick="deleteTask(${t.id})" style="background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">撤回</button>
+                        </div>
+                    `).join('');
+                }
+                panel.style.display = 'block';
+
+                const treeSelect = document.getElementById('assign_tree_select');
+                if (treeSelect.value) {
+                    const event = new Event('change');
+                    treeSelect.dispatchEvent(event);
+                }
+
+            } catch (e) {
+                console.error('加载任务失败:', e);
+            }
+        }
+
+        async function deleteTask(taskId) {
+            if (!confirm('确定要撤回此任务吗？用户任务列表中的对应看板将消失。')) return;
+
+            try {
+                const resp = await fetch(`${API_BASE}/tasks/${taskId}?user_id=${currentUser.id}`, {
+                    method: 'DELETE'
+                });
+                if (resp.ok) {
+                    alert('任务已撤回');
+                    loadUserTasks();
+                } else {
+                    const data = await resp.json();
+                    alert('撤回失败: ' + (data.error || '未知错误'));
+                }
+            } catch (e) {
+                alert('系统错误');
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理 - 技能树管理系统</title>
+    <link rel="stylesheet" href="libs/css/fonts.css">
+    <style>
+        :root {
+            --surface-0: #f1f3f6;
+            --surface-1: #ffffff;
+            --surface-2: #f8fafc;
+            --surface-3: #f1f5f9;
+            --text-h: #0f172a;
+            --text-p: #334155;
+            --text-s: #64748b;
+            --border: #e2e8f0;
+            --accent: #334155;
+            --accent-hover: #1e293b;
+            --accent-focus: #94a3b8;
+            --ok: #059669;
+            --ok-bg: #ecfdf5;
+            --warn: #d97706;
+            --warn-bg: #fffbeb;
+            --err: #dc2626;
+            --err-bg: #fef2f2;
+            --gold: #ca8a04;
+            --cyan: #0891b2;
+            --font-body: 'Inter', 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--surface-0);
+            min-height: 100vh;
+            color: var(--text-p);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--surface-1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-h);
+            margin: 0;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-s);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-h);
+        }
+
+        .logout-btn {
+            color: var(--err) !important;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            padding: 30px 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: calc(100% - 80px);
+            flex: 1;
+        }
+
+        /* Sidebar Form */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: var(--text-h);
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-s);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-h);
+            font-family: var(--font-body);
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--surface-1);
+            box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.08);
+        }
+
+        /* Radios & Checkboxes */
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .choice-item {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .choice-item input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .choice-label {
+            display: block;
+            padding: 8px 4px;
+            text-align: center;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-s);
+            transition: all 0.2s;
+        }
+
+        .choice-item input:checked + .choice-label {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .module-tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .module-tag input {
+            margin: 0;
+        }
+
+        .module-tag:has(input:checked) {
+            background: rgba(8, 145, 178, 0.1);
+            color: var(--cyan);
+            border-color: rgba(8, 145, 178, 0.3);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--text-s);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* User List View */
+        .user-view {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--surface-1);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-h);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-s);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--surface-1);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: sticky;
+            top: 100px;
+            z-index: 90;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .search-box::after {
+            content: '🔍';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        .filter-groups {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-pill {
+            padding: 6px 14px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-s);
+        }
+
+        .filter-pill.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border-color: var(--accent-focus);
+        }
+
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .user-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-h);
+            margin-bottom: 4px;
+        }
+
+        .user-meta {
+            font-size: 12px;
+            color: var(--text-s);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-badge {
+            padding: 2px 8px;
+            background: var(--surface-3);
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--text-h);
+        }
+
+        .role-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-admin { background: var(--ok-bg); color: var(--ok); border: 1px solid rgba(5,150,105,0.2); }
+        .badge-leader { background: rgba(8,145,178,0.1); color: var(--cyan); border: 1px solid rgba(8,145,178,0.2); }
+
+        .user-modules {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .user-module-tag {
+            font-size: 11px;
+            background: var(--surface-3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--text-s);
+        }
+
+        .edit-btn {
+            margin-top: auto;
+            width: 100%;
+            padding: 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-p);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        @media (max-width: 1000px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                width: calc(100% - 40px);
+            }
+            .sidebar {
+                position: static;
+            }
+            .filter-bar {
+                top: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1><span>👥</span> USER PORTAL</h1>
+        <div class="nav-links">
+            <span id="user_info" style="font-weight: 600; font-size: 14px; color: var(--accent);"></span>
+            <a href="/">技能树管理</a>
+            <a href="/dashboard.html">管理大盘</a>
+            <a href="javascript:void(0)" onclick="logout()" class="logout-btn">退出登录</a>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Dashboard Sidebar -->
+        <div class="sidebar">
+            <div class="card">
+                <h2 id="form_title">✨ 创建新用户</h2>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="new_username" placeholder="设置登录账号">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="new_password" placeholder="留空则不修改原密码">
+                </div>
+                <div class="form-group">
+                    <label>所属组别</label>
+                    <div class="choice-grid">
+                        <label class="choice-item">
+                            <input type="radio" name="user_group" value="A" checked>
+                            <span class="choice-label">A组</span>
+                        </label>
+                        <label class="choice-item">
+                            <input type="radio" name="user_group" value="B">
+                            <span class="choice-label">B组</span>
+                        </label>
+                        <label class="choice-item">
+                            <input type="radio" name="user_group" value="C">
+                            <span class="choice-label">C组</span>
+                        </label>
+                        <label class="choice-item">
+                            <input type="radio" name="user_group" value="D">
+                            <span class="choice-label">D组</span>
+                        </label>
+                        <label class="choice-item">
+                            <input type="radio" name="user_group" value="Office">
+                            <span class="choice-label">Office</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>权限设置</label>
+                    <div class="checkbox-group">
+                        <label class="module-tag">
+                            <input type="checkbox" id="is_admin"> 管理员
+                        </label>
+                        <label class="module-tag">
+                            <input type="checkbox" id="is_leader"> 组长
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>分配模块 (多选)</label>
+                    <div id="module_checkboxes" class="checkbox-group"></div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <input type="text" id="custom_module" placeholder="新增模块名称" style="flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px;">
+                        <button class="btn-primary" onclick="addCustomModule()" style="width: 40px; margin: 0;">+</button>
+                    </div>
+                </div>
+                <button class="btn-primary" id="submit_user_btn" onclick="submitUser()">完成并创建</button>
+                <button class="btn-cancel" id="cancel_edit_btn" onclick="cancelEdit()" style="display: none;">放弃修改</button>
+            </div>
+        </div>
+
+        <!-- Main User List View -->
+        <div class="user-view">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-val" id="stat_total">0</div>
+                    <div class="stat-label">总成员</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat_admin" style="color: var(--ok);">0</div>
+                    <div class="stat-label">管理员</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat_leader" style="color: var(--cyan);">0</div>
+                    <div class="stat-label">组长</div>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-box">
+                    <input type="text" id="user_search" placeholder="快速查找用户名..." oninput="handleSearch()">
+                </div>
+                <div class="filter-groups">
+                    <div class="filter-pill active" onclick="setGroupFilter('all', this)">全部</div>
+                    <div class="filter-pill" onclick="setGroupFilter('A', this)">A组</div>
+                    <div class="filter-pill" onclick="setGroupFilter('B', this)">B组</div>
+                    <div class="filter-pill" onclick="setGroupFilter('C', this)">C组</div>
+                    <div class="filter-pill" onclick="setGroupFilter('D', this)">D组</div>
+                    <div class="filter-pill" onclick="setGroupFilter('Office', this)">Office</div>
+                    <div style="width: 1px; height: 20px; background: var(--border); margin: 0 4px;"></div>
+                    <div class="filter-pill" id="leader_filter" onclick="toggleLeaderFilter(this)">👑 组长</div>
+                </div>
+            </div>
+
+            <div id="user_list" class="user-list">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let allUsers = [];
+        let filters = { search: '', group: 'all', leaderOnly: false };
+        let editingUserId = null;
+
+        // Auth check
+        const currentUserStr = localStorage.getItem('currentUser');
+        if (!currentUserStr) {
+            window.location.href = '/login.html?redirect=/users.html';
+        } else {
+            const user = JSON.parse(currentUserStr);
+            if (!user.is_admin) {
+                alert("无权限访问");
+                window.location.href = '/view.html';
+            } else {
+                document.getElementById('user_info').textContent = '管理员: ' + user.username;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/login.html?redirect=/users.html';
+        }
+
+        async function loadData() {
+            try {
+                const [userResp, modResp] = await Promise.all([
+                    fetch(`${API_BASE}/users`),
+                    fetch(`${API_BASE}/modules`)
+                ]);
+                
+                allUsers = await userResp.json();
+                const modsData = await modResp.json();
+                
+                // 合并用户模块和技能树模块，确保显示全系统当前存在的所有模块选项
+                const combinedMods = new Set([
+                    ...(modsData.user || []),
+                    ...(modsData.node || [])
+                ]);
+                const mods = Array.from(combinedMods).sort();
+                if (mods.length === 0) mods.push('默认模块');
+                
+                renderStats();
+                renderUserList();
+                renderModuleCheckboxes(mods);
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        function renderStats() {
+            document.getElementById('stat_total').textContent = allUsers.length;
+            document.getElementById('stat_admin').textContent = allUsers.filter(u => u.is_admin).length;
+            document.getElementById('stat_leader').textContent = allUsers.filter(u => u.is_leader).length;
+        }
+
+        function renderModuleCheckboxes(modules) {
+            const container = document.getElementById('module_checkboxes');
+            container.innerHTML = '';
+            modules.forEach(mod => {
+                const label = document.createElement('label');
+                label.className = 'module-tag';
+                label.innerHTML = `<input type="checkbox" name="user_modules" value="${mod}"> ${mod}`;
+                container.appendChild(label);
+            });
+        }
+
+        function addCustomModule() {
+            const input = document.getElementById('custom_module');
+            const mod = input.value.trim();
+            if (mod) {
+                const container = document.getElementById('module_checkboxes');
+                const label = document.createElement('label');
+                label.className = 'module-tag';
+                label.innerHTML = `<input type="checkbox" name="user_modules" value="${mod}" checked> ${mod}`;
+                container.appendChild(label);
+                input.value = '';
+            }
+        }
+
+        function handleSearch() {
+            filters.search = document.getElementById('user_search').value;
+            renderUserList();
+        }
+
+        function setGroupFilter(group, el) {
+            filters.group = group;
+            document.querySelectorAll('.filter-pill:not(#leader_filter)').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            renderUserList();
+        }
+
+        function toggleLeaderFilter(el) {
+            filters.leaderOnly = !filters.leaderOnly;
+            el.classList.toggle('active');
+            renderUserList();
+        }
+
+        function renderUserList() {
+            const listDiv = document.getElementById('user_list');
+            const filtered = allUsers.filter(u => {
+                const matchSearch = u.username.toLowerCase().includes(filters.search.toLowerCase());
+                const matchGroup = filters.group === 'all' || u.group === filters.group;
+                const matchLeader = !filters.leaderOnly || u.is_leader;
+                return matchSearch && matchGroup && matchLeader;
+            });
+
+            if (filtered.length === 0) {
+                listDiv.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-s);">没有找到匹配的用户</div>`;
+                return;
+            }
+
+            listDiv.innerHTML = filtered.map(u => {
+                const mods = u.module ? u.module.split(',') : [];
+                return `
+                    <div class="user-card">
+                        <div class="user-card-header">
+                            <div>
+                                <div class="user-name">${u.username}</div>
+                                <div class="user-meta">
+                                    <span class="group-badge">${u.group || 'A'}组</span>
+                                    <span>ID: ${u.id}</span>
+                                </div>
+                            </div>
+                            <div class="role-badges">
+                                ${u.is_admin ? '<span class="badge badge-admin">管理员</span>' : ''}
+                                ${u.is_leader ? '<span class="badge badge-leader">组长</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="user-modules">
+                            ${mods.map(m => `<span class="user-module-tag">${m.trim()}</span>`).join('') || '<span style="color:var(--text-s); font-size:11px;">未分配模块</span>'}
+                        </div>
+                        <button class="edit-btn" onclick='editUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ 编辑账号信息</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editUser(user) {
+            editingUserId = user.id;
+            document.getElementById('form_title').textContent = '✏️ 修改: ' + user.username;
+            document.getElementById('new_username').value = user.username;
+            document.getElementById('new_password').value = '';
+            document.getElementById('is_admin').checked = user.is_admin;
+            document.getElementById('is_leader').checked = user.is_leader;
+            
+            const groupRadio = document.querySelector(`input[name="user_group"][value="${user.group || 'A'}"]`);
+            if (groupRadio) groupRadio.checked = true;
+
+            const userMods = user.module ? user.module.split(',').map(m => m.trim()) : [];
+            const container = document.getElementById('module_checkboxes');
+            
+            // 确保用户原有的每一个模块在界面上都有对应的多选框
+            userMods.forEach(m => {
+                const trimmed = m.trim();
+                if (trimmed && !document.querySelector(`input[name="user_modules"][value="${trimmed}"]`)) {
+                    const label = document.createElement('label');
+                    label.className = 'module-tag';
+                    label.innerHTML = `<input type="checkbox" name="user_modules" value="${trimmed}" checked> ${trimmed}`;
+                    container.appendChild(label);
+                }
+            });
+
+            // 统一设置勾选状态
+            document.querySelectorAll('input[name="user_modules"]').forEach(cb => {
+                cb.checked = userMods.includes(cb.value);
+            });
+
+            document.getElementById('submit_user_btn').textContent = '更新用户信息';
+            document.getElementById('cancel_edit_btn').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingUserId = null;
+            document.getElementById('form_title').textContent = '✨ 创建新用户';
+            document.getElementById('new_username').value = '';
+            document.getElementById('new_password').value = '';
+            document.getElementById('is_admin').checked = false;
+            document.getElementById('is_leader').checked = false;
+            document.getElementById('submit_user_btn').textContent = '完成并创建';
+            document.getElementById('cancel_edit_btn').style.display = 'none';
+        }
+
+        async function submitUser() {
+            const username = document.getElementById('new_username').value.trim();
+            const password = document.getElementById('new_password').value;
+            if (!username) return alert('请填写用户名');
+
+            const checkedModules = Array.from(document.querySelectorAll('input[name="user_modules"]:checked')).map(el => el.value);
+            const userGroup = document.querySelector('input[name="user_group"]:checked').value;
+
+            const payload = {
+                username,
+                password,
+                is_admin: document.getElementById('is_admin').checked,
+                is_leader: document.getElementById('is_leader').checked,
+                module: checkedModules.join(','),
+                group: userGroup
+            };
+
+            const url = editingUserId ? `${API_BASE}/users/${editingUserId}` : `${API_BASE}/users`;
+            const method = editingUserId ? 'PUT' : 'POST';
+
+            try {
+                const resp = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (resp.ok) {
+                    alert('操作成功');
+                    cancelEdit();
+                    loadData();
+                } else {
+                    const err = await resp.json();
+                    alert('失败: ' + err.error);
+                }
+            } catch (e) {
+                alert('系统错误');
+            }
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+
+</html>

@@ -16,7 +16,8 @@ def create_admin():
         admin = User(
             username='admin',
             password='admin123',  # 简单密码，实际应该加密
-            is_admin=True
+            is_admin=True,
+            group='Office'
         )
         db.session.add(admin)
         db.session.commit()

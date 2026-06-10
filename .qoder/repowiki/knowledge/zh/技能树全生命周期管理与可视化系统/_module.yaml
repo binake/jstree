@@ -1,0 +1,41 @@
+schema_version: 1
+module_path: ""
+title: 技能树全生命周期管理与可视化系统
+scope:
+    - libs/
+    - .gitignore
+    - QuickNodeAdder.html
+    - README.md
+    - _fix_mode.js
+    - _fix_mode2.js
+    - _fix_mode3.js
+    - _fix_mode4.js
+    - _patch_mode.py
+    - app.py
+    - create_admin.py
+    - dashboard.html
+    - import_nodes.html
+    - index.html
+    - login.html
+    - migrate_db.py
+    - migrate_db_v2.py
+    - migrate_db_v3.py
+    - requirements.txt
+    - run.bat
+    - users.html
+    - view.html
+    - instance\skill_tree-backup.db
+    - instance\skill_tree.db
+    - libs\css\fonts.css
+    - libs\css\jsmind.css
+    - libs\css\tailwind.css
+    - libs\fonts\inter.woff2
+    - libs\fonts\orbitron.woff2
+    - libs\js\jsmind.draggable-node.js
+    - libs\js\jsmind.js
+    - libs\js\papaparse.min.js
+    - 节点信息显示方案.md
+    - 项目说明文档.md
+source_files: []
+depends_on: []
+related_to: []

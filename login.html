@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - 技能树管理系统</title>
+    <link rel="stylesheet" href="libs/css/fonts.css">
+    <style>
+        :root {
+            --surface-0: #eef0f3;
+            --surface-1: #f4f5f7;
+            --surface-2: #fafafa;
+            --text-h: #1a1f2e;
+            --text-p: #3d4451;
+            --text-s: #6b7280;
+            --border: #dde1e7;
+            --border-focus: #8b9bbf;
+            --accent: #4a5568;
+            --accent-hover: #2d3748;
+            /* aliases */
+            --bg-primary: var(--surface-0);
+            --bg-secondary: var(--surface-0);
+            --bg-card: var(--surface-1);
+            --bg-input: var(--surface-2);
+            --cyan: var(--accent);
+            --text-primary: var(--text-h);
+            --text-secondary: var(--text-s);
+            --border-glow: var(--border);
+            --font-body: 'Inter', 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* No background patterns or busy grids */
+        body::before {
+            display: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card h2 {
+            font-weight: 800;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            background: var(--accent);
+            color: #ffffff;
+            border: 1px solid var(--accent);
+            border-radius: 7px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        #error-msg {
+            color: #dc2626;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            min-height: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>System Login</h2>
+        <div class="form-group">
+            <label>用户名 / Username</label>
+            <input type="text" id="username" placeholder="请输入用户名" />
+        </div>
+        <div class="form-group">
+            <label>密码 / Password</label>
+            <input type="password" id="password" placeholder="请输入密码" />
+        </div>
+        <button class="btn" onclick="login()">登 录</button>
+        <div id="error-msg"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+
+        // Check if already logged in and redirect appropriately
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            const user = JSON.parse(currentUser);
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else if (user.is_admin) {
+                window.location.href = '/';
+            } else {
+                window.location.href = '/view.html';
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!username) {
+                errorMsg.textContent = '请输入用户名';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: result.id,
+                        username: result.username,
+                        is_admin: result.is_admin,
+                        is_leader: result.is_leader,
+                        group: result.group,
+                        module: result.module
+                    }));
+                    
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    } else if (result.is_admin) {
+                        window.location.href = '/';
+                    } else {
+                        window.location.href = '/view.html';
+                    }
+                } else {
+                    errorMsg.textContent = result.error || '登录失败';
+                }
+            } catch (error) {
+                errorMsg.textContent = '网络错误：' + error.message;
+            }
+        }
+        
+        // Allow pressing Enter to login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
